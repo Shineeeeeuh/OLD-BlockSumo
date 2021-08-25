@@ -94,10 +94,10 @@ public class GameManager {
 		ArrayList<BSPlayer> aliveplayers = instance.getPlayerManager().getAlivePlayers();
 		if(aliveplayers.size() == 1) {
 			BSPlayer bsp = aliveplayers.get(0);
-			Bukkit.broadcastMessage("§c§lCRAFTOK §7| §6§l"+bsp.getPlayerName()+" §ea gagné !");
+			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c"+bsp.getPlayerName()+" §7a gagné !");
 			new PlayerUtils(bsp.getPlayer()).sendTitle(10, 20, 10, "§eVous avez", "§6§lGAGNÉ");
 			new EndTask().runTaskTimer(instance, 0, 140);
-			bsp.getPlayer().sendMessage("§c§lCraftok §7| §eVous avez gagner §610 §ecoins !");
+			bsp.getPlayer().sendMessage("§c§lCRAFTOK §8» §7Vous avez gagné §c10 coins §7!");
 			instance.getAPI().getUserManager().getUserByName(bsp.getPlayerName()).addCoins(10);
 		}
 	}
