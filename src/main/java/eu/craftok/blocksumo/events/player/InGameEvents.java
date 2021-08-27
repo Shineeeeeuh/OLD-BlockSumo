@@ -53,6 +53,9 @@ public class InGameEvents implements Listener{
 	
 	@EventHandler
 	public void onDamageByPlayer(EntityDamageByEntityEvent e) {
+		if(gamemanager.getState() != GameState.INGAME) {
+			return;
+		}
 		if(e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
 			Player p = (Player) e.getEntity();
 			Player v = (Player) e.getDamager();
@@ -93,7 +96,7 @@ public class InGameEvents implements Listener{
 	public void onPlace(BlockPlaceEvent e) {
 		if(e.getBlock().getType() == Material.TNT) {
 			e.getBlock().setType(Material.AIR);
-			e.getBlock().getLocation().getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.PRIMED_TNT);
+			e.getBlock().getLocation().getWorld().spawnEntity(e.getBlock().getLocation().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
 			if(e.getPlayer().getItemInHand().getAmount()-1 == 0) {
 				e.getPlayer().setItemInHand(null);
 			}else {

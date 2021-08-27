@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -65,10 +66,10 @@ public class GameManager {
 		for(BSPlayer player : playermanager.getPlayers()) {
 			player.initPlayerAbilities();
 			player.loadKit();
-			map.teleportToSpawn(player.getPlayer());
 			player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 255));
 			player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 9999999, 255));
 		}
+		map.teleportToSpawn();
 		instance.getGameManager().setState(GameState.TIMER);
 		Bukkit.getScheduler().runTaskLater(instance, new BukkitRunnable() {
 			
@@ -96,8 +97,11 @@ public class GameManager {
 			BSPlayer bsp = aliveplayers.get(0);
 			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c"+bsp.getPlayerName()+" §7a gagné !");
 			new PlayerUtils(bsp.getPlayer()).sendTitle(10, 20, 10, "§eVous avez", "§6§lGAGNÉ");
-			new EndTask().runTaskTimer(instance, 0, 140);
 			bsp.getPlayer().sendMessage("§c§lCRAFTOK §8» §7Vous avez gagné §c10 coins §7!");
+			for(Player p : Bukkit.getOnlinePlayers()) {
+				p.setGameMode(GameMode.SPECTATOR);
+			}
+			new EndTask().runTaskTimer(instance, 100, 20);
 			instance.getAPI().getUserManager().getUserByName(bsp.getPlayerName()).addCoins(10);
 		}
 	}

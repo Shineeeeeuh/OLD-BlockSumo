@@ -1,5 +1,7 @@
 package eu.craftok.blocksumo.events.player;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,6 +12,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.enums.GameState;
@@ -32,6 +35,7 @@ public class LobbyPlayerEvents implements Listener{
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onJoin(PlayerJoinEvent e) {
 		Player player = e.getPlayer();
@@ -53,7 +57,15 @@ public class LobbyPlayerEvents implements Listener{
 			if(players > 1) {
 				playermanager.updateSB();
 			}
-			player.getPlayer().teleport(gamemanager.getPlayedMap().getLobby());
+			Location l = gamemanager.getPlayedMap().getLobby();
+			l.getChunk().load();
+			Bukkit.getScheduler().runTaskLater(instance, new BukkitRunnable() {
+				
+				@Override
+				public void run() {
+					player.getPlayer().teleport(gamemanager.getPlayedMap().getLobby());
+				}
+			}, 1);
 			if(players == 2) {
 				starttask = new StartTask(instance);
 				starttask.runTaskTimer(instance, 20, 20);
