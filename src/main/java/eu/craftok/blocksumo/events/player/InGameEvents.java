@@ -18,6 +18,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 
@@ -30,11 +31,13 @@ import eu.craftok.blocksumo.player.BSPlayerManager;
 public class InGameEvents implements Listener{
 	
 	private GameManager gamemanager;
+	private BlockSumo instance;
 	private BSPlayerManager playermanager;
 	
 	public InGameEvents(BlockSumo instance) {
 		this.gamemanager = instance.getGameManager();
 		this.playermanager = instance.getPlayerManager();
+		this.instance = instance;
 	}
 	
 	@EventHandler
@@ -121,6 +124,18 @@ public class InGameEvents implements Listener{
 				 }
 			 }
 		}
+	}
+	
+	@EventHandler
+    public void onConsume(PlayerItemConsumeEvent e) {
+        if (e.getItem().getType().equals(Material.POTION)) {
+            Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(instance, new Runnable() {
+                @Override
+                public void run() {
+                    e.getPlayer().setItemInHand(new ItemStack(Material.AIR));
+                }
+            }, 1L);
+        }
 	}
 	
 

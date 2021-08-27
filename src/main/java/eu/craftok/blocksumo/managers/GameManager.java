@@ -92,11 +92,15 @@ public class GameManager {
 	}
 	
 	public void checkWin() {
+		if(instance.getGameManager().getState() == GameState.FINISH || instance.getGameManager().getState() == GameState.WAITING) {
+			return;
+		}
 		ArrayList<BSPlayer> aliveplayers = instance.getPlayerManager().getAlivePlayers();
 		if(aliveplayers.size() == 1) {
 			BSPlayer bsp = aliveplayers.get(0);
 			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c"+bsp.getPlayerName()+" §7a gagné !");
 			new PlayerUtils(bsp.getPlayer()).sendTitle(10, 20, 10, "§eVous avez", "§6§lGAGNÉ");
+			Bukkit.getScheduler().cancelAllTasks();
 			bsp.getPlayer().sendMessage("§c§lCRAFTOK §8» §7Vous avez gagné §c10 coins §7!");
 			for(Player p : Bukkit.getOnlinePlayers()) {
 				p.setGameMode(GameMode.SPECTATOR);

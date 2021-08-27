@@ -99,6 +99,7 @@ public class BSPlayer {
 			utils.sendActionBar("§f"+life+" §c\u2764 §7restante(s).");
 			for (int i = 0; i < 35; i++){
 				ItemStack item = getPlayer().getInventory().getItem(i);
+				if(item == null) continue;
 				if(!(item.getType() == Material.WOOL) && !(item.getType() == Material.SHEARS)) {
 					getPlayer().getInventory().setItem(i, new ItemStack(Material.AIR));
 				}
