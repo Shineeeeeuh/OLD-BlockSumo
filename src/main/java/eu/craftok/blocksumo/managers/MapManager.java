@@ -12,9 +12,11 @@ import eu.craftok.blocksumo.map.MapArena;
 public class MapManager {
 	private File mapfolder;
 	private ArrayList<MapArena> maps = new ArrayList<MapArena>();
+	private BlockSumo instance;
 	
 	public MapManager(BlockSumo instance) {
 		loadMaps(new File(instance.getDataFolder(), "maps"));
+		this.instance = instance;
 	}
 	
 	public void loadMaps(File directory) {
@@ -39,7 +41,7 @@ public class MapManager {
 		for(int i = 1; i <= posnb; i++) {
 			locations.add(fc.getString("positions."+i));
 		}
-		maps.add(new MapArena(f.getName(), locations, fc.getString("locations.lobby"), fc.getString("world.file"), fc.getString("locations.bonus")));
+		maps.add(new MapArena(f.getName(), locations, fc.getString("locations.lobby"), fc.getString("world.file"), fc.getString("locations.bonus"), instance));
 	}
 
 	 public File getMapFolder() {

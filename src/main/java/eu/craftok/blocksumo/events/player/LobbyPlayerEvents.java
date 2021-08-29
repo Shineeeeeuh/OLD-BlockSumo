@@ -39,13 +39,21 @@ public class LobbyPlayerEvents implements Listener{
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onJoin(PlayerJoinEvent e) {
 		Player player = e.getPlayer();
+		if(instance.getPlayerManager().getPlayers().size() > 8) {
+			BSPlayer bsp = new BSPlayer(player.getName(), true, instance);
+			e.setJoinMessage(null);
+			bsp.initPlayerAbilities();
+			bsp.loadSpectator();
+			playermanager.addPlayers(bsp);
+			playermanager.updateSB();
+			return;
+		}
 		if(gamemanager.getState() == GameState.INGAME || gamemanager.getState() == GameState.FINISH) {
 			BSPlayer bsp = new BSPlayer(player.getName(), true, instance);
 			e.setJoinMessage(null);
 			bsp.initPlayerAbilities();
 			bsp.loadSpectator();
 			playermanager.addPlayers(bsp);
-			bsp.loadScoreboard();
 			playermanager.updateSB();
 		}else {
 			BSPlayer bsp = new BSPlayer(player.getName(), instance);

@@ -11,15 +11,20 @@ import org.bukkit.entity.Player;
 
 import com.google.common.collect.Lists;
 
+import eu.craftok.blocksumo.BlockSumo;
+import eu.craftok.blocksumo.player.BSPlayer;
+
 public class MapArena {
 	private ArrayList<String> spawns;
 	private String name, lobby, world, bonus;
+	private BlockSumo instance;
 	
-	public MapArena(String name, ArrayList<String> spawns, String lobby, String world, String bonus) {
+	public MapArena(String name, ArrayList<String> spawns, String lobby, String world, String bonus, BlockSumo instance) {
 		this.spawns = spawns;
 		this.name = name;
 		this.lobby = lobby;
 		this.world = world;
+		this.instance = instance;
 		this.bonus = bonus;
 	}
 	
@@ -38,7 +43,8 @@ public class MapArena {
 	
 	public void teleportToSpawn() {
 		List<String> locationrandom = Lists.newArrayList(spawns);
-		for(Player p : Bukkit.getOnlinePlayers()) {
+		for(BSPlayer bsp : instance.getPlayerManager().getAlivePlayers()) {
+			Player p = bsp.getPlayer();
 			int randomIndex = new Random().nextInt(locationrandom.size());
 			String[] location = locationrandom.get(randomIndex).split(";");
 			p.teleport(new Location(Bukkit.getWorld(world), Double.parseDouble(location[0]), Double.parseDouble(location[1]), Double.parseDouble(location[2])));

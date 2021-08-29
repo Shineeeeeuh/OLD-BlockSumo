@@ -45,6 +45,16 @@ public class BSPlayerManager {
 		return aliveplayers;
 	}
 	
+	public ArrayList<BSPlayer> getDeadPlayers(){
+		ArrayList<BSPlayer> deadplayers = new ArrayList<>();
+		for(BSPlayer bsp : players) {
+			if(bsp.isSpectator()) {
+				deadplayers.add(bsp);
+			}
+		}
+		return deadplayers;
+	}
+	
 	public void updateSB() {
 		List<String> lines = new ArrayList<>();
 		lines.add(" ");
