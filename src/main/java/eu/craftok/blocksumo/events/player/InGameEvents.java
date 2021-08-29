@@ -5,19 +5,23 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
@@ -77,8 +81,24 @@ public class InGameEvents implements Listener{
 	}
 	
 	@EventHandler
+	public void onInteract(PlayerInteractEvent e) {
+		ItemStack it = e.getItem();
+		if(it == null || it.getType() != Material.FIREBALL) return;
+		Action act = e.getAction();
+		e.setCancelled(true);
+		if(act != Action.RIGHT_CLICK_AIR && act != Action.RIGHT_CLICK_BLOCK) return;
+		spawnFireBall(e.getPlayer());
+		if(e.getPlayer().getItemInHand().getAmount()-1 == 0) {
+			e.getPlayer().setItemInHand(null);
+		}else {
+			e.getPlayer().getItemInHand().setAmount(e.getPlayer().getItemInHand().getAmount()-1);
+		}
+		return;
+	}
+	
+	@EventHandler
 	public void onExplode(EntityExplodeEvent e) {
-		if(e.getEntityType() == EntityType.PRIMED_TNT) {
+		if(e.getEntityType() == EntityType.PRIMED_TNT || e.getEntityType() == EntityType.FIREBALL) {
 			List<Block> d = e.blockList();
 			Iterator<Block> it = d.iterator();
 			while (it.hasNext()) {
@@ -138,5 +158,13 @@ public class InGameEvents implements Listener{
         }
 	}
 	
+	//Author: Sithey
+	public void spawnFireBall(Player p) {
+		Location e = p.getEyeLocation().add(p.getEyeLocation().getDirection().multiply(1.2));
+		Fireball fb = (Fireball) p.getWorld().spawnEntity(e, EntityType.FIREBALL);
+		fb.setVelocity(fb.getDirection().normalize().multiply(2));
+		fb.setShooter(p);
+		fb.setIsIncendiary(false);
+	}
 
 }

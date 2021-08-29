@@ -24,6 +24,7 @@ public class BonusManager {
 		items.add(new ItemStack(Material.SNOW_BALL, 5));
 		items.add(new ItemStack(Material.ENDER_PEARL));
 		items.add(new ItemCreator(Material.IRON_SWORD).addEnchantment(Enchantment.KNOCKBACK, 1).setDurability(Material.IRON_SWORD.getMaxDurability()).getItemstack());
+		items.add(new ItemCreator(Material.FIREBALL).setName("§6Fire§eBall").getItemstack());
 	}
 	
 	public ItemStack getRandomItem() {

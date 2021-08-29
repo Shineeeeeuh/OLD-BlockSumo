@@ -43,8 +43,7 @@ public class MapArena {
 	
 	public void teleportToSpawn() {
 		List<String> locationrandom = Lists.newArrayList(spawns);
-		for(BSPlayer bsp : instance.getPlayerManager().getAlivePlayers()) {
-			Player p = bsp.getPlayer();
+		for(Player p : Bukkit.getOnlinePlayers()) {
 			int randomIndex = new Random().nextInt(locationrandom.size());
 			String[] location = locationrandom.get(randomIndex).split(";");
 			p.teleport(new Location(Bukkit.getWorld(world), Double.parseDouble(location[0]), Double.parseDouble(location[1]), Double.parseDouble(location[2])));
