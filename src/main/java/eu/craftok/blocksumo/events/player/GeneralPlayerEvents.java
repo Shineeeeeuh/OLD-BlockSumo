@@ -30,6 +30,7 @@ public class GeneralPlayerEvents implements Listener {
 	public void onChat(AsyncPlayerChatEvent e) {
 		BSPlayer bsp = instance.getPlayerManager().getPlayer(e.getPlayer().getName());
 		if(bsp.isSpectator()) {
+			e.setCancelled(true);
 			for(BSPlayer bs : instance.getPlayerManager().getDeadPlayers()){
 				Player p = bs.getPlayer();
 				p.sendMessage("§7[SPECTATEUR] §f"+e.getPlayer().getName()+" : "+e.getMessage());
