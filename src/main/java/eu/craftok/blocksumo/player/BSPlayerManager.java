@@ -67,7 +67,7 @@ public class BSPlayerManager {
 		    lines.add(" §fStatus §3» §bEn jeu");
 		    lines.add(" ");
 		    for (BSPlayer bsp : instance.getPlayerManager().getAlivePlayers()) {
-		        lines.add("§f" + bsp.getPlayerName() + " §3» §b§l" + bsp.getLife() + " §c\u2764");
+		        lines.add("§f" + bsp.getPlayerName().substring(0, 13) + " §3» §b§l" + bsp.getLife() + " §c\u2764");
 		    }
 		}
 		lines.add(" ");
