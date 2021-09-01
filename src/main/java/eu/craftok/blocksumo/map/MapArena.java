@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import com.google.common.collect.Lists;
 
 import eu.craftok.blocksumo.BlockSumo;
-import eu.craftok.blocksumo.player.BSPlayer;
 
 public class MapArena {
 	private ArrayList<String> spawns;
