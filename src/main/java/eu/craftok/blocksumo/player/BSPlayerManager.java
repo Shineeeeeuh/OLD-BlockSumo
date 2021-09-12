@@ -38,6 +38,7 @@ public class BSPlayerManager {
 	public ArrayList<BSPlayer> getAlivePlayers(){
 		ArrayList<BSPlayer> aliveplayers = new ArrayList<>();
 		for(BSPlayer bsp : players) {
+			if(bsp == null) continue;
 			if(!bsp.isSpectator()) {
 				aliveplayers.add(bsp);
 			}
@@ -66,7 +67,7 @@ public class BSPlayerManager {
 		else {
 		    lines.add(" §fStatus §3» §bEn jeu");
 		    lines.add(" ");
-		    for (BSPlayer bsp : instance.getPlayerManager().getAlivePlayers()) {
+		    for (BSPlayer bsp : getAlivePlayers()) {
 		    	if(bsp.getPlayerName().length() >= 13) {
 		    		lines.add("§f" + bsp.getPlayerName().substring(0, 13) + " §3» §b§l" + bsp.getLife() + " §c\u2764");
 		    	}else {

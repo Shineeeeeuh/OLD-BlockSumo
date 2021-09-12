@@ -42,18 +42,20 @@ public class LobbyPlayerEvents implements Listener{
 		if(instance.getPlayerManager().getPlayers().size() > 8) {
 			BSPlayer bsp = new BSPlayer(player.getName(), true, instance);
 			e.setJoinMessage(null);
+			playermanager.addPlayers(bsp);
+			bsp.loadScoreboard();
 			bsp.initPlayerAbilities();
 			bsp.loadSpectator();
-			playermanager.addPlayers(bsp);
 			playermanager.updateSB();
 			return;
 		}
 		if(gamemanager.getState() == GameState.INGAME || gamemanager.getState() == GameState.FINISH) {
 			BSPlayer bsp = new BSPlayer(player.getName(), true, instance);
 			e.setJoinMessage(null);
+			playermanager.addPlayers(bsp);
+			bsp.loadScoreboard();
 			bsp.initPlayerAbilities();
 			bsp.loadSpectator();
-			playermanager.addPlayers(bsp);
 			playermanager.updateSB();
 		}else {
 			BSPlayer bsp = new BSPlayer(player.getName(), instance);

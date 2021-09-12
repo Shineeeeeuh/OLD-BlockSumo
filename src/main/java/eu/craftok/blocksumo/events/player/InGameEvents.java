@@ -60,6 +60,10 @@ public class InGameEvents implements Listener{
 	
 	@EventHandler
 	public void onDamageByPlayer(EntityDamageByEntityEvent e) {
+		if(instance.getPlayerManager().getPlayer(e.getEntity().getName()).isInvicibility()) {
+			e.setCancelled(true);
+			return;
+		}
 		if(gamemanager.getState() != GameState.INGAME) {
 			return;
 		}
@@ -165,6 +169,7 @@ public class InGameEvents implements Listener{
 		fb.setVelocity(fb.getDirection().normalize().multiply(2));
 		fb.setShooter(p);
 		fb.setIsIncendiary(false);
+		fb.setYield(5F);
 	}
 
 }

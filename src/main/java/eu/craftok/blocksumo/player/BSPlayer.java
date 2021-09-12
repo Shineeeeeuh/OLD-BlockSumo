@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.enums.GameState;
@@ -23,7 +24,7 @@ import eu.craftok.utils.PlayerUtils;
 public class BSPlayer {
 	private int life;
 	private String playername;
-	private boolean isSpectator;
+	private boolean isSpectator, invicibility;
 	private BlockSumo instance;
 	private ScoreboardBuilder sb;
 	
@@ -32,6 +33,7 @@ public class BSPlayer {
 		this.life = 5;
 		this.isSpectator = false;
 		this.instance = instance;
+		this.invicibility = false;
 	}
 	
 	public BSPlayer(String player, boolean isSpectator, BlockSumo instance) {
@@ -39,6 +41,7 @@ public class BSPlayer {
 		this.life = 0;
 		this.playername = player;
 		this.instance = instance;
+		this.invicibility = false;
 	}
 	
 	public Player getPlayer() {
@@ -86,6 +89,7 @@ public class BSPlayer {
 		inventory.setItem(1, new ItemStack(Material.WOOL, 64, (byte) new Random().nextInt(15)));
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void kill() {
 		PlayerUtils utils = new PlayerUtils(getPlayer());
 		this.life = life-1;
@@ -93,6 +97,7 @@ public class BSPlayer {
 			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est mort, il lui reste §c§l"+life+" §7vie(s) !");
 			instance.getGameManager().getPlayedMap().teleport(getPlayer());
 			instance.getPlayerManager().updateSB();
+			setInvicibility(true);
 			for (PotionEffect effect : getPlayer().getActivePotionEffects()) {
 				getPlayer().removePotionEffect(effect.getType());
 			}
@@ -104,6 +109,13 @@ public class BSPlayer {
 					getPlayer().getInventory().setItem(i, new ItemStack(Material.AIR));
 				}
 			}
+			Bukkit.getScheduler().scheduleSyncDelayedTask(instance, new BukkitRunnable() {
+				
+				@Override
+				public void run() {
+					setInvicibility(false);
+				}
+			}, 60L);
 		}
 		if(life == 0) {
 			loadSpectator();
@@ -156,6 +168,14 @@ public class BSPlayer {
 		sb.updateLines(lines);
 	}
 	
+	
+	public void setInvicibility(boolean invicibility) {
+		this.invicibility = invicibility;
+	}
+	
+	public boolean isInvicibility() {
+		return invicibility;
+	}
 	
 	public void updateActionBar() {
         PlayerUtils utils = new PlayerUtils(getPlayer());
