@@ -28,28 +28,28 @@ import org.bukkit.inventory.ItemStack;
 
 import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.enums.GameState;
+import eu.craftok.blocksumo.game.Game;
 import eu.craftok.blocksumo.managers.GameManager;
 import eu.craftok.blocksumo.player.BSPlayer;
-import eu.craftok.blocksumo.player.BSPlayerManager;
 
 public class InGameEvents implements Listener{
 	
 	private GameManager gamemanager;
 	private BlockSumo instance;
-	private BSPlayerManager playermanager;
 	
 	public InGameEvents(BlockSumo instance) {
 		this.gamemanager = instance.getGameManager();
-		this.playermanager = instance.getPlayerManager();
 		this.instance = instance;
 	}
 	
 	@EventHandler
 	public void onDamage(EntityDamageEvent e) {
-		if(gamemanager.getState() == GameState.INGAME) {
+		if(e.getEntity().getType() != EntityType.PLAYER) return;
+		Game g = gamemanager.getGameByPlayer((Player) e.getEntity());
+		if(g.getState() == GameState.INGAME) {
 			if(e.getCause() == DamageCause.VOID) {
 				e.setCancelled(true);
-				BSPlayer bsp = playermanager.getPlayer(e.getEntity().getName());
+				BSPlayer bsp = g.getPlayer(e.getEntity().getName());
 				bsp.kill();
 			}
 			e.setDamage(0D);
@@ -60,11 +60,12 @@ public class InGameEvents implements Listener{
 	
 	@EventHandler
 	public void onDamageByPlayer(EntityDamageByEntityEvent e) {
-		if(instance.getPlayerManager().getPlayer(e.getEntity().getName()).isInvicibility()) {
+		Game g = instance.getGameManager().getGameByPlayer((Player) e.getEntity());
+		if(g.getPlayer(e.getEntity().getName()).isInvicibility()) {
 			e.setCancelled(true);
 			return;
 		}
-		if(gamemanager.getState() != GameState.INGAME) {
+		if(g.getState() != GameState.INGAME) {
 			return;
 		}
 		if(e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
@@ -103,6 +104,7 @@ public class InGameEvents implements Listener{
 	@EventHandler
 	public void onExplode(EntityExplodeEvent e) {
 		if(e.getEntityType() == EntityType.PRIMED_TNT || e.getEntityType() == EntityType.FIREBALL) {
+			Game g = instance.getGameManager().getGameByWorld(e.getLocation().getWorld().getName());
 			List<Block> d = e.blockList();
 			Iterator<Block> it = d.iterator();
 			while (it.hasNext()) {
@@ -110,9 +112,8 @@ public class InGameEvents implements Listener{
 				if(!(b.getType() == Material.WOOL)) {
 					it.remove();
 				}else {
-					if(gamemanager.getBlocksPlaced().containsKey(b.getLocation())) {
-						Bukkit.getScheduler().cancelTask(gamemanager.getBlocksPlaced().get(b.getLocation()));
-						gamemanager.getBlocksPlaced().remove(b.getLocation());
+					if(g.getBlocksPlaced().containsKey(b.getLocation())) {
+						g.getBlocksPlaced().remove(b.getLocation());
 					}
 				}
 			}

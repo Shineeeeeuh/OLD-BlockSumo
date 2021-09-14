@@ -1,25 +1,37 @@
 package eu.craftok.blocksumo.tasks;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class EndTask extends BukkitRunnable {
-	private int timer = 1;
+import eu.craftok.blocksumo.BlockSumo;
+import eu.craftok.blocksumo.game.Game;
+import eu.craftok.blocksumo.player.BSPlayer;
+
+public class EndTask extends BukkitRunnable{
+	
+	private int gameid, counter;
+	private BlockSumo instance;
+	
+	public EndTask(BlockSumo instance, Game g) {
+		this.instance = instance;
+		this.counter = 1;
+		this.gameid = g.getID();
+	}
 
 	@Override
 	public void run() {
-		if(timer == 1) {
-			for(Player p : Bukkit.getOnlinePlayers()) {
-				p.kickPlayer("");
+		if(counter == 1) {
+			Game g = instance.getGameManager().getGameByID(gameid);
+			for(BSPlayer bsp : g.getPlayers()) {
+				bsp.getPlayer().kickPlayer(" ");
 			}
-			timer = 0;
+			counter--;
 		}
-		if(timer == 0) {
-			Bukkit.getServer().shutdown();
+		if(counter == 0) {
+			instance.getGameManager().removeGame(gameid);
 			cancel();
 		}
 	}
 	
 	
+
 }

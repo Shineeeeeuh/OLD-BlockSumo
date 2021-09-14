@@ -17,31 +17,40 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.enums.GameState;
+import eu.craftok.blocksumo.game.Game;
 import eu.craftok.blocksumo.scoreboard.ScoreboardBuilder;
 import eu.craftok.utils.ItemCreator;
 import eu.craftok.utils.PlayerUtils;
 
 public class BSPlayer {
-	private int life;
-	private String playername;
+	private int life, gameid;
+	private String playername, mapname;
 	private boolean isSpectator, invicibility;
 	private BlockSumo instance;
 	private ScoreboardBuilder sb;
 	
-	public BSPlayer(String player, BlockSumo instance) {
+	public BSPlayer(String player, BlockSumo instance, Game g) {
 		this.playername = player;
 		this.life = 5;
 		this.isSpectator = false;
 		this.instance = instance;
+		this.gameid = g.getID();
 		this.invicibility = false;
+		this.mapname = g.getMap().getWorld();
 	}
 	
-	public BSPlayer(String player, boolean isSpectator, BlockSumo instance) {
+	public BSPlayer(String player, boolean isSpectator, BlockSumo instance, Game g) {
 		this.isSpectator = isSpectator;
 		this.life = 0;
 		this.playername = player;
 		this.instance = instance;
 		this.invicibility = false;
+		this.mapname = g.getMap().getWorld();
+		this.gameid = g.getID();
+	}
+	
+	public String getMapName() {
+		return mapname;
 	}
 	
 	public Player getPlayer() {
@@ -92,11 +101,12 @@ public class BSPlayer {
 	@SuppressWarnings("deprecation")
 	public void kill() {
 		PlayerUtils utils = new PlayerUtils(getPlayer());
+		Game g = instance.getGameManager().getGameByID(gameid);
 		this.life = life-1;
 		if(life >= 1) {
-			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est mort, il lui reste §c§l"+life+" §7vie(s) !");
-			instance.getGameManager().getPlayedMap().teleport(getPlayer());
-			instance.getPlayerManager().updateSB();
+			g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est mort, il lui reste §c§l"+life+" §7vie(s) !");
+			g.teleport(getPlayer());
+			g.updateSB();
 			setInvicibility(true);
 			for (PotionEffect effect : getPlayer().getActivePotionEffects()) {
 				getPlayer().removePotionEffect(effect.getType());
@@ -119,11 +129,11 @@ public class BSPlayer {
 		}
 		if(life == 0) {
 			loadSpectator();
-			instance.getPlayerManager().updateSB();
+			g.updateSB();
 			utils.sendTitle(10, 20, 10, "§c§lVous avez", "§c§lPERDU");
-			instance.getGameManager().checkWin();
+			g.checkWin();
 			utils.sendActionBar("§cVous êtes mort !");
-			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est éliminé(e) !");
+			g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est éliminé(e) !");
 			return;
 		}
 	}
@@ -134,24 +144,25 @@ public class BSPlayer {
 		PlayerInventory inventory = p.getInventory();
 		inventory.clear();
 		inventory.setArmorContents(null);
-		p.teleport(new Location(Bukkit.getWorld(instance.getGameManager().getPlayedMap().getWorld()), 0.5, 50.5, 0.5));
+		p.teleport(new Location(Bukkit.getWorld(instance.getGameManager().getGameByID(gameid).getWorld()), 0.5, 50.5, 0.5));
 		p.setGameMode(GameMode.SPECTATOR);
 	}
 	
 	public void loadScoreboard() {
 		sb = new ScoreboardBuilder(getPlayer());
 		List<String> lines = new ArrayList<>();
+		Game g = instance.getGameManager().getGameByID(gameid);
 		sb.updateTitle("§c§lBLOCKSUMO");
 		lines.add(" ");
 		lines.add("§c§lPARTIE");
-		lines.add(" §fJoueurs §3» §b" + this.instance.getPlayerManager().getAlivePlayers().size() + "/8");
-		if (instance.getGameManager().getState() == GameState.WAITING) {
+		lines.add(" §fJoueurs §3» §b" + g.getAlivePlayers().size() + "/8");
+		if (g.getState() == GameState.WAITING) {
 		    lines.add(" §fStatus §3» §bAttente");
 		}
 		else {
 		    lines.add(" §fStatus §3» §bEn jeu");
 		    lines.add(" ");
-		    for (BSPlayer bsp : instance.getPlayerManager().getAlivePlayers()) {
+		    for (BSPlayer bsp : g.getAlivePlayers()) {
 		    	if(bsp.getPlayerName().length() >= 13) {
 		    		lines.add("§f" + bsp.getPlayerName().substring(0, 13) + " §3» §b§l" + bsp.getLife() + " §c\u2764");
 		    	}else {
@@ -162,7 +173,7 @@ public class BSPlayer {
 		lines.add(" ");
 		lines.add("§c§lJEU");
 		lines.add(" §fMode §3» §bSolo");
-		lines.add(" §fMap §3» §b" + instance.getGameManager().getPlayedMap().getWorld());
+		lines.add(" §fMap §3» §b" + g.getMap().getWorld());
 		lines.add(" ");
 		lines.add("§b[§fcraftok.fr§c]");
 		sb.updateLines(lines);

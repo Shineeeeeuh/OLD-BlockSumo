@@ -1,5 +1,7 @@
 package eu.craftok.blocksumo.events.player;
 
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,76 +18,63 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.enums.GameState;
+import eu.craftok.blocksumo.game.Game;
 import eu.craftok.blocksumo.managers.GameManager;
 import eu.craftok.blocksumo.player.BSPlayer;
-import eu.craftok.blocksumo.player.BSPlayerManager;
 import eu.craftok.blocksumo.tasks.StartTask;
 
 public class LobbyPlayerEvents implements Listener{
 	
 	private BlockSumo instance;
 	private GameManager gamemanager;
-	private StartTask starttask;
-	private BSPlayerManager playermanager;
+	private static HashMap<Integer, StartTask> starttaskid;
 	
 	public LobbyPlayerEvents(BlockSumo instance) {
 		this.instance = instance;
 		this.gamemanager = instance.getGameManager();
-		this.playermanager = instance.getPlayerManager();
+		starttaskid = new HashMap<>();
+	}
+	
+	public static HashMap<Integer, StartTask> getStartTaskID() {
+		return starttaskid;
 	}
 	
 	
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onJoin(PlayerJoinEvent e) {
+		e.setJoinMessage("");
 		Player player = e.getPlayer();
-		if(instance.getPlayerManager().getPlayers().size() > 8) {
-			BSPlayer bsp = new BSPlayer(player.getName(), true, instance);
-			e.setJoinMessage(null);
-			playermanager.addPlayers(bsp);
-			bsp.loadScoreboard();
-			bsp.initPlayerAbilities();
-			bsp.loadSpectator();
-			playermanager.updateSB();
+		Game g = gamemanager.getGameByID(instance.getGameManager().getCurrentGame());
+		BSPlayer bsp = new BSPlayer(player.getName(), instance, g);
+		g.addPlayers(bsp);
+		int players = g.getPlayers().size();
+		g.broadcastMessage("§f"+player.getName()+" §7vient de rejoindre la partie §a("+players+"/8)");
+		bsp.loadWaitingItems();
+		bsp.loadScoreboard();
+		if(players > 1) {
+			g.updateSB();
+		}
+		Location l = g.getMap().getLobby();
+		l.setWorld(Bukkit.getWorld(g.getWorld()));
+		l.getChunk().load();
+		Bukkit.getScheduler().runTaskLater(instance, new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				player.getPlayer().teleport(l);
+			}
+		}, 1);
+		if(players == 2) {
+			StartTask starttask = new StartTask(instance, g);
+			starttask.runTaskTimer(instance, 20, 20);
+			starttask.setTaskID(starttask.getTaskId());
+			starttaskid.put(g.getID(), starttask);
 			return;
 		}
-		if(gamemanager.getState() == GameState.INGAME || gamemanager.getState() == GameState.FINISH) {
-			BSPlayer bsp = new BSPlayer(player.getName(), true, instance);
-			e.setJoinMessage(null);
-			playermanager.addPlayers(bsp);
-			bsp.loadScoreboard();
-			bsp.initPlayerAbilities();
-			bsp.loadSpectator();
-			playermanager.updateSB();
-		}else {
-			BSPlayer bsp = new BSPlayer(player.getName(), instance);
-			playermanager.addPlayers(bsp);
-			int players = playermanager.getPlayers().size();
-			e.setJoinMessage("§f"+player.getName()+" §7vient de rejoindre la partie §a("+players+"/8)");
-			bsp.loadWaitingItems();
-			bsp.loadScoreboard();
-			if(players > 1) {
-				playermanager.updateSB();
-			}
-			Location l = gamemanager.getPlayedMap().getLobby();
-			l.getChunk().load();
-			Bukkit.getScheduler().runTaskLater(instance, new BukkitRunnable() {
-				
-				@Override
-				public void run() {
-					player.getPlayer().teleport(gamemanager.getPlayedMap().getLobby());
-				}
-			}, 1);
-			if(players == 2) {
-				starttask = new StartTask(instance);
-				starttask.runTaskTimer(instance, 20, 20);
-				starttask.setTaskID(starttask.getTaskId());
-				return;
-			}
-			if(players == 8) {
-				if(starttask.getTimer() > 5) {
-					StartTask.setTimer(5);
-				}
+		if(players == 8) {
+			if(starttaskid.get(g.getID()).getTimer() > 5) {
+				starttaskid.get(g.getID()).setTimer(5);
 			}
 		}
 	}
@@ -93,23 +82,24 @@ public class LobbyPlayerEvents implements Listener{
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onQuit(PlayerQuitEvent e) {
 		Player player = e.getPlayer();
-		if(gamemanager.getState() == GameState.INGAME || gamemanager.getState() == GameState.FINISH) {
+		Game g = gamemanager.getGameByPlayer(player);
+		if(g.getState() == GameState.INGAME || g.getState() == GameState.FINISH) {
 			e.setQuitMessage(null);
-			if(playermanager.getPlayer(player.getName()) != null) {
-				playermanager.removePlayers(playermanager.getPlayer(player.getName()));
-				playermanager.updateSB();
-				gamemanager.checkWin();
+			if(g.getPlayer(player.getName()) != null) {
+				g.removePlayers(g.getPlayer(player.getName()));
+				g.updateSB();
+				g.checkWin();
 			}
-			if(starttask != null && playermanager.getPlayers().size() == 1) {
-				starttask.cancel();
+			if(starttaskid.get(g.getID()) != null && g.getPlayers().size() == 1) {
+				starttaskid.get(g.getID()).cancel();
 				return;
 			}
 		}else {
-			e.setQuitMessage("§f"+player.getName()+" §7vient de quitter la partie §c("+playermanager.getPlayers().size()+"/8)");
-			playermanager.updateSB();
-			playermanager.removePlayers(playermanager.getPlayer(player.getName()));
-			if(starttask != null && playermanager.getPlayers().size() == 1) {
-				starttask.cancel();
+			g.broadcastMessage("§f"+player.getName()+" §7vient de quitter la partie §c("+g.getPlayers().size()+"/8)");
+			g.updateSB();
+			g.removePlayers(g.getPlayer(player.getName()));
+			if(starttaskid.get(g.getID()) != null && g.getPlayers().size() == 1) {
+				starttaskid.get(g.getID()).cancel();
 				return;
 			}
 		}
@@ -117,7 +107,8 @@ public class LobbyPlayerEvents implements Listener{
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onDamage(EntityDamageEvent e) {
-		if(gamemanager.getState() == GameState.WAITING || gamemanager.getState() == GameState.FINISH || gamemanager.getState() == GameState.TIMER) {
+		Game g = gamemanager.getGameByPlayer((Player) e.getEntity());
+		if(g.getState() == GameState.WAITING || g.getState() == GameState.FINISH || g.getState() == GameState.TIMER) {
 			e.setCancelled(true);
 			return;
 		}
@@ -125,10 +116,10 @@ public class LobbyPlayerEvents implements Listener{
 	
 	@EventHandler
 	public void onBreak(BlockBreakEvent e) {
-		GameManager gamemanager = instance.getGameManager();
-		if(gamemanager.getState() == GameState.INGAME && e.getBlock().getType() == Material.WOOL) {
-			if(gamemanager.getBlocksPlaced().containsKey(e.getBlock().getLocation())) {
-				gamemanager.getBlocksPlaced().remove(e.getBlock().getLocation());
+		Game g = gamemanager.getGameByWorld(e.getBlock().getLocation().getWorld().getName());
+		if(g.getState() == GameState.INGAME && e.getBlock().getType() == Material.WOOL) {
+			if(g.getBlocksPlaced().containsKey(e.getBlock().getLocation())) {
+				g.getBlocksPlaced().remove(e.getBlock().getLocation());
 			}
 			return;
 		}
@@ -137,9 +128,9 @@ public class LobbyPlayerEvents implements Listener{
 	
 	@EventHandler
 	public void onPlace(BlockPlaceEvent e) {
-		GameManager gamemanager = instance.getGameManager();
-		if(gamemanager.getState() == GameState.INGAME && e.getBlock().getType() == Material.WOOL) {
-			gamemanager.getBlocksPlaced().put(e.getBlock().getLocation(), 0);
+		Game g = gamemanager.getGameByWorld(e.getBlock().getLocation().getWorld().getName());
+		if(g.getState() == GameState.INGAME && e.getBlock().getType() == Material.WOOL) {
+			g.getBlocksPlaced().put(e.getBlock().getLocation(), 0);
 			return;
 		}
 		e.setCancelled(true);

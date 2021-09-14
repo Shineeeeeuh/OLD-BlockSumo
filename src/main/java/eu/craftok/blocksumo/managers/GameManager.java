@@ -1,113 +1,101 @@
 package eu.craftok.blocksumo.managers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.craftok.blocksumo.BlockSumo;
-import eu.craftok.blocksumo.enums.GameState;
+import eu.craftok.blocksumo.game.Game;
 import eu.craftok.blocksumo.map.MapArena;
-import eu.craftok.blocksumo.player.BSPlayer;
-import eu.craftok.blocksumo.player.BSPlayerManager;
-import eu.craftok.blocksumo.tasks.BlockTask;
-import eu.craftok.blocksumo.tasks.BonusTask;
-import eu.craftok.blocksumo.tasks.EndTask;
-import eu.craftok.utils.PlayerUtils;
 
 public class GameManager {
-	private GameState state;
 	private BlockSumo instance;
-	private MapArena map;
-	private HashMap<Location, Integer> blocksplaced;
+	private HashMap<String, Integer> playersgameid;
+	private HashMap<Integer, Game> games;
+	private AtomicInteger count = new AtomicInteger(0);
+	private int currentgame;
+	private boolean full;
 	
 	public GameManager(BlockSumo instance) {
-		state = GameState.WAITING;
-		this.instance = instance;
 		pickRandomMap();
-		blocksplaced = new HashMap<>();
+		games = new HashMap<>();
+		playersgameid = new HashMap<>();
+		this.instance = instance;
+		this.full = false;
 	}
 	
-	public HashMap<Location, Integer> getBlocksPlaced() {
-		return blocksplaced;
+	public void createGame() {
+		MapArena map = pickRandomMap();
+		Game g = new Game(instance, count.getAndIncrement(), map);
+		currentgame = g.getID();
+		g.generateWorld();
+		games.put(g.getID(), g);
+		return;
 	}
 	
-	public GameState getState() {
-		return state;
+	public boolean isFull() {
+		return full;
 	}
 	
-	public void setState(GameState state) {
-		this.state = state;
+	public void setFull(boolean full) {
+		this.full = full;
 	}
 	
+	public void removeGame(int id) {
+		Game g = getGameByID(id);
+		g.deleteWorld();
+		for(String n : playersgameid.keySet()) {
+			if(getGameByPlayerName(n).getID() == id) {
+				playersgameid.remove(n);
+				continue;
+			}
+		}
+		games.remove(id);
+	}
 	
-	public void pickRandomMap() {
+	public Game getGameByWorld(String world) {
+		for(Game g : games.values()) {
+			if(g.getWorld().equalsIgnoreCase(world)) {
+				return g;
+			}
+			continue;
+		}
+		return null;
+	}
+	
+	public int getGameNumbers() {
+		return games.size();
+	}
+	
+	public Game getGameByID(int id) {
+		return games.get(id);
+	}
+	
+	public Game getGameByPlayer(Player p) {
+		return games.get(playersgameid.get(p.getName()));
+	}
+	
+	public Game getGameByPlayerName(String name) {
+		return games.get(playersgameid.get(name));
+	}
+	
+	public void setPlayerToGame(Player p, int id) {
+		playersgameid.put(p.getName(), id);
+	}
+	
+	public void removePlayerToGame(Player p) {
+		playersgameid.remove(p.getName());
+	}
+	
+	public MapArena pickRandomMap() {
 		int randomIndex = new Random().nextInt(instance.getMapManager().getMaps().size());
-		map = instance.getMapManager().getMaps().get(randomIndex);
+		return instance.getMapManager().getMaps().get(randomIndex);
 	}
 	
-	
-	public MapArena getPlayedMap() {
-		return map;
-	}
-	
-	@SuppressWarnings("deprecation")
-	public void startGame() {
-		instance.getPlayerManager().updateSB();
-		BSPlayerManager playermanager = instance.getPlayerManager();
-		for(BSPlayer player : playermanager.getPlayers()) {
-			player.initPlayerAbilities();
-			player.loadKit();
-			player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 255));
-			player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 9999999, 255));
-		}
-		map.teleportToSpawn();
-		instance.getGameManager().setState(GameState.TIMER);
-		Bukkit.getScheduler().runTaskLater(instance, new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				for(Player p : Bukkit.getOnlinePlayers()) {
-					for (PotionEffect effect : p.getActivePotionEffects()) {
-						p.removePotionEffect(effect.getType());
-					}
-					PlayerUtils utils = new PlayerUtils(p);
-					utils.sendActionBar("§f"+5+" §c\u2764 §frestante(s).");
-					utils.sendSound(Sound.ENDERDRAGON_GROWL, 1.0f);
-					utils.sendTitle(10, 20, 10, "§6Bonne chance !", "");
-				}
-				new BlockTask(instance).runTaskTimer(instance, 20L, 20L);
-				instance.getGameManager().setState(GameState.INGAME);
-			}
-		}, 60);
-		new BonusTask(instance).runTaskTimer(instance, 600, 600);
-	}
-	
-	public void checkWin() {
-		if(instance.getGameManager().getState() == GameState.FINISH || instance.getGameManager().getState() == GameState.WAITING) {
-			return;
-		}
-		ArrayList<BSPlayer> aliveplayers = instance.getPlayerManager().getAlivePlayers();
-		if(aliveplayers.size() == 1) {
-			BSPlayer bsp = aliveplayers.get(0);
-			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c"+bsp.getPlayerName()+" §7a gagné !");
-			new PlayerUtils(bsp.getPlayer()).sendTitle(10, 20, 10, "§eVous avez", "§6§lGAGNÉ");
-			Bukkit.getScheduler().cancelAllTasks();
-			bsp.getPlayer().sendMessage("§c§lCRAFTOK §8» §7Vous avez gagné §c10 coins §7!");
-			for(Player p : Bukkit.getOnlinePlayers()) {
-				p.setGameMode(GameMode.SPECTATOR);
-			}
-			new EndTask().runTaskTimer(instance, 100, 20);
-			instance.getAPI().getUserManager().getUserByName(bsp.getPlayerName()).addCoins(10);
-		}
+	public int getCurrentGame() {
+		return currentgame;
 	}
 	
 	
