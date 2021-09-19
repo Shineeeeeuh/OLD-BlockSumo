@@ -35,6 +35,7 @@ public class BlockTask extends BukkitRunnable{
 			return;
 		}
 		for (BSPlayer bs : g.getPlayers()) {
+			if(bs.isVanished()) return;
             bs.updateActionBar();
         }
 		if(g.getBlocksPlaced().size() == 0) {

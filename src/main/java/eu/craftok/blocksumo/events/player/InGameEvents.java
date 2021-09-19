@@ -4,8 +4,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -22,14 +25,19 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.enums.GameState;
 import eu.craftok.blocksumo.game.Game;
+import eu.craftok.blocksumo.guis.GameGui;
 import eu.craftok.blocksumo.managers.GameManager;
 import eu.craftok.blocksumo.player.BSPlayer;
+import eu.craftok.utils.PlayerUtils;
+import eu.craftok.utils.inventory.CustomInventory;
 
 public class InGameEvents implements Listener{
 	
@@ -44,6 +52,10 @@ public class InGameEvents implements Listener{
 	@EventHandler
 	public void onDamage(EntityDamageEvent e) {
 		if(e.getEntity().getType() != EntityType.PLAYER) return;
+		if(instance.isVanished((Player) e.getEntity())) {
+			e.setCancelled(true);
+			return;
+		}
 		Game g = gamemanager.getGameByPlayer((Player) e.getEntity());
 		if(g == null) return;
 		if(g.getState() == GameState.INGAME) {
@@ -60,6 +72,10 @@ public class InGameEvents implements Listener{
 	
 	@EventHandler
 	public void onDamageByPlayer(EntityDamageByEntityEvent e) {
+		if(instance.isVanished((Player) e.getEntity())) {
+			e.setCancelled(true);
+			return;
+		}
 		Game g = instance.getGameManager().getGameByPlayer((Player) e.getEntity());
 		if(g.getPlayer(e.getEntity().getName()).isInvicibility()) {
 			e.setCancelled(true);
@@ -88,15 +104,37 @@ public class InGameEvents implements Listener{
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
 		ItemStack it = e.getItem();
-		if(it == null || it.getType() != Material.FIREBALL) return;
+		if(it == null) return;
 		Action act = e.getAction();
-		e.setCancelled(true);
-		if(act != Action.RIGHT_CLICK_AIR && act != Action.RIGHT_CLICK_BLOCK) return;
-		spawnFireBall(e.getPlayer());
-		if(e.getPlayer().getItemInHand().getAmount()-1 == 0) {
-			e.getPlayer().setItemInHand(null);
-		}else {
-			e.getPlayer().getItemInHand().setAmount(e.getPlayer().getItemInHand().getAmount()-1);
+		if(it.getType() == Material.FIREBALL) {
+			e.setCancelled(true);
+			if(act != Action.RIGHT_CLICK_AIR && act != Action.RIGHT_CLICK_BLOCK) return;
+			spawnFireBall(e.getPlayer());
+			if(e.getPlayer().getItemInHand().getAmount()-1 == 0) {
+				e.getPlayer().setItemInHand(null);
+			}else {
+				e.getPlayer().getItemInHand().setAmount(e.getPlayer().getItemInHand().getAmount()-1);
+			}
+			return;
+		}
+		if(it.getType() == Material.COMPASS) {
+			if(act != Action.RIGHT_CLICK_AIR && act != Action.RIGHT_CLICK_BLOCK) return;
+			CustomInventory cs = new GameGui(e.getPlayer(), instance);
+			cs.openMenu();
+			return;
+		}
+		if(it.getType() == Material.FEATHER) {
+			if(act != Action.RIGHT_CLICK_AIR && act != Action.RIGHT_CLICK_BLOCK) return;
+			e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(1.5).setY(1.25));
+			new PlayerUtils(e.getPlayer()).sendSound(Sound.FIREWORK_LAUNCH, 1F);
+			e.getPlayer().getWorld().playEffect(e.getPlayer().getLocation(), Effect.SMOKE, 5);
+			e.getPlayer().getWorld().strikeLightningEffect(e.getPlayer().getLocation());
+			if(e.getPlayer().getItemInHand().getAmount()-1 == 0) {
+				e.getPlayer().setItemInHand(null);
+			}else {
+				e.getPlayer().getItemInHand().setAmount(e.getPlayer().getItemInHand().getAmount()-1);
+			}
+			return;
 		}
 		return;
 	}
@@ -154,8 +192,24 @@ public class InGameEvents implements Listener{
 	@EventHandler
     public void onConsume(PlayerItemConsumeEvent e) {
         if (e.getItem().getType().equals(Material.POTION)) {
-        	e.getPlayer().setItemInHand(new ItemStack(Material.AIR));
+        	Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(instance, new Runnable() {
+                @Override
+                public void run() {
+                	for (int i = 0; i < 9; i++){
+        				ItemStack item = e.getPlayer().getInventory().getItem(i);
+        				if(item == null) continue;
+        				if(item.getType() == Material.GLASS_BOTTLE) {
+        					e.getPlayer().getInventory().setItem(i, new ItemStack(Material.AIR));
+        				}
+        			}
+                }
+            }, 1L);
         }
+	}
+	
+	@EventHandler
+	public void onCraft(CraftItemEvent e) {
+		e.setCancelled(true);
 	}
 	
 	//Author: Sithey
@@ -167,5 +221,24 @@ public class InGameEvents implements Listener{
 		fb.setIsIncendiary(false);
 		fb.setYield(5F);
 	}
-
+	
+	@EventHandler
+	public void onPickUPItem(PlayerPickupItemEvent e) {
+		Player p = e.getPlayer();
+		ItemStack it = e.getItem().getItemStack();
+		if(it.getType() == Material.FEATHER) {
+			for (int i = 0; i < 35; i++){
+				ItemStack item = p.getInventory().getItem(i);
+				if(item == null) continue;
+				if(item.getType() == Material.FEATHER) {
+					p.sendMessage("§cVous avez déjà un boost de double jump ! Utiliser le pour en reutiliser un !");
+					e.setCancelled(true);
+					return;
+				}
+			}
+			return;
+		}
+		return;
+	}
+	
 }

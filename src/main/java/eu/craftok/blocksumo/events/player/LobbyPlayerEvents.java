@@ -22,6 +22,7 @@ import eu.craftok.blocksumo.game.Game;
 import eu.craftok.blocksumo.managers.GameManager;
 import eu.craftok.blocksumo.player.BSPlayer;
 import eu.craftok.blocksumo.tasks.StartTask;
+import eu.craftok.utils.ItemCreator;
 
 public class LobbyPlayerEvents implements Listener{
 	
@@ -45,11 +46,23 @@ public class LobbyPlayerEvents implements Listener{
 	public void onJoin(PlayerJoinEvent e) {
 		e.setJoinMessage("");
 		Player player = e.getPlayer();
+		if(instance.isVanished(player)) {
+			player.getInventory().setItem(4, new ItemCreator(Material.COMPASS).setName("§6Joueurs").getItemstack());
+			player.setFlying(true);
+			player.setAllowFlight(true);
+			Location l = new Location(player.getWorld(), 0, 80, 0);
+			player.teleport(l);
+			return;
+		}
 		Game g = gamemanager.getGameByID(instance.getGameManager().getCurrentGame());
 		BSPlayer bsp = new BSPlayer(player.getName(), instance, g);
 		g.addPlayers(bsp);
 		for(Player p2 : Bukkit.getOnlinePlayers()) {
 			if(p2.getName() == player.getName()) continue;
+			if(instance.isVanished(p2)) {
+				player.hidePlayer(p2);
+				continue;
+			}
 			if(instance.getGameManager().getGameByPlayer(p2).getID() == g.getID()) {
 				p2.showPlayer(player);
 				player.showPlayer(p2);
@@ -101,7 +114,7 @@ public class LobbyPlayerEvents implements Listener{
 			gamemanager.removePlayerToGame(player);
 			return;
 		}
-		if(g.getState() != null && g.getState() == GameState.INGAME) {
+		if(g.getState() != null && g.getState() == GameState.INGAME || g.getState() == GameState.FINISH || g.getState() == GameState.TIMER) {
 			if(g.getPlayer(player.getName()) != null) {
 				g.removePlayers(g.getPlayer(player.getName()));
 				g.updateSB();

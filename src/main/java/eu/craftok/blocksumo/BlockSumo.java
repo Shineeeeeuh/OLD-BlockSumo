@@ -1,5 +1,6 @@
 package eu.craftok.blocksumo;
 
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.craftok.blocksumo.commands.StartCMD;
@@ -43,4 +44,11 @@ public class BlockSumo extends JavaPlugin{
 		return mapmanager;
 	}
 	
+	public boolean isVanished(Player p) {
+		if(p != null && p.hasMetadata("vanished") && !p.getMetadata("vanished").isEmpty()) {
+			return p.getMetadata("vanished").get(0).asBoolean();
+		}else {
+			return false;
+		}
+	}
 }

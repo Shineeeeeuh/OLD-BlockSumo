@@ -25,7 +25,7 @@ import eu.craftok.utils.PlayerUtils;
 public class BSPlayer {
 	private int life, gameid;
 	private String playername, mapname;
-	private boolean isSpectator, invicibility;
+	private boolean isSpectator, invicibility, vanished;
 	private BlockSumo instance;
 	private ScoreboardBuilder sb;
 	
@@ -37,16 +37,22 @@ public class BSPlayer {
 		this.gameid = g.getID();
 		this.invicibility = false;
 		this.mapname = g.getMap().getWorld();
+		this.vanished = false;
 	}
 	
-	public BSPlayer(String player, boolean isSpectator, BlockSumo instance, Game g) {
-		this.isSpectator = isSpectator;
+	public BSPlayer(String player, boolean vanished, BlockSumo instance, Game g) {
+		this.isSpectator = false;
 		this.life = 0;
 		this.playername = player;
 		this.instance = instance;
 		this.invicibility = false;
 		this.mapname = g.getMap().getWorld();
 		this.gameid = g.getID();
+		this.vanished = vanished;
+	}
+	
+	public boolean isVanished() {
+		return vanished;
 	}
 	
 	public String getMapName() {
@@ -68,6 +74,7 @@ public class BSPlayer {
 	public String getPlayerName() {
 		return playername;
 	}
+	
 	
 	public void initPlayerAbilities() {
 		Player p = getPlayer();
@@ -102,6 +109,11 @@ public class BSPlayer {
 	public void kill() {
 		PlayerUtils utils = new PlayerUtils(getPlayer());
 		Game g = instance.getGameManager().getGameByID(gameid);
+		ItemStack it = getPlayer().getItemOnCursor();
+		if(it.getType() != Material.SHEARS && it.getType() != Material.WOOL) {
+			getPlayer().setItemOnCursor(null);
+		}
+		getPlayer().closeInventory();
 		this.life = life-1;
 		if(life >= 1) {
 			g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est mort, il lui reste §c§l"+life+" §7vie(s) !");

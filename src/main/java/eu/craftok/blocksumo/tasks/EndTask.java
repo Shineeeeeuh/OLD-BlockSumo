@@ -6,7 +6,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.game.Game;
-import eu.craftok.blocksumo.player.BSPlayer;
 
 public class EndTask extends BukkitRunnable{
 	
@@ -23,6 +22,7 @@ public class EndTask extends BukkitRunnable{
 		Game g = instance.getGameManager().getGameByID(gameid);
 		if(g.getPlayers() != null && g.getPlayers().size() > 0) {
 			for(Player p : Bukkit.getOnlinePlayers()) {
+				if(instance.isVanished(p)) continue;
 				Game pg = instance.getGameManager().getGameByPlayer(p);
 				if(pg != null && pg.getID() == g.getID()) {
 					p.kickPlayer(" ");

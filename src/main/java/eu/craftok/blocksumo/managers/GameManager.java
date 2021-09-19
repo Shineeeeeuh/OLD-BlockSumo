@@ -33,6 +33,10 @@ public class GameManager {
 		return;
 	}
 	
+	public HashMap<Integer, Game> getGames() {
+		return games;
+	}
+	
 	public void removeGame(int id) {
 		games.remove(id);
 	}

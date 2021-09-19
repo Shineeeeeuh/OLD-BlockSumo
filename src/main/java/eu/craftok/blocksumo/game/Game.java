@@ -84,7 +84,7 @@ public class Game {
 	public void teleportToSpawn() {
 		List<String> locationrandom = Lists.newArrayList(map.getSpawns());
 		for(BSPlayer bsp : players) {
-			if(bsp.isSpectator()) continue;
+			if(bsp.isVanished()) continue;
 			int randomIndex = new Random().nextInt(locationrandom.size());
 			String[] location = locationrandom.get(randomIndex).split(";");
 			Player p = bsp.getPlayer();
@@ -97,6 +97,7 @@ public class Game {
 	public void start() {
 		updateSB();
 		for(BSPlayer player : getPlayers()) {
+			if(player.isVanished()) continue;
 			player.initPlayerAbilities();
 			player.loadKit();
 			player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 255));
@@ -110,7 +111,7 @@ public class Game {
 			@Override
 			public void run() {
 				for(BSPlayer bsp : players) {
-					if(bsp.isSpectator()) continue;
+					if(bsp.isVanished()) continue;
 					Player p = bsp.getPlayer();
 					for (PotionEffect effect : p.getActivePotionEffects()) {
 						p.removePotionEffect(effect.getType());
@@ -144,6 +145,7 @@ public class Game {
 		ArrayList<BSPlayer> aliveplayers = new ArrayList<>();
 		for(BSPlayer bsp : players) {
 			if(bsp == null) continue;
+			if(bsp.isVanished()) continue;
 			if(!bsp.isSpectator()) {
 				aliveplayers.add(bsp);
 			}
@@ -154,6 +156,7 @@ public class Game {
 	public ArrayList<BSPlayer> getDeadPlayers(){
 		ArrayList<BSPlayer> deadplayers = new ArrayList<>();
 		for(BSPlayer bsp : players) {
+			if(bsp.isVanished()) continue;
 			if(bsp.isSpectator()) {
 				deadplayers.add(bsp);
 			}
@@ -195,6 +198,7 @@ public class Game {
 		lines.add(" ");
 		lines.add("§b[§fcraftok.fr§c]");
 		for(BSPlayer bsp : getPlayers()) {
+			if(bsp.isVanished()) continue;
 			bsp.updateSB(lines);
 		}
 	}
@@ -296,7 +300,7 @@ public class Game {
 		double y = Double.parseDouble(location[1]);
 		int i2 = (int) Double.parseDouble(location[2]);
 		Location l = new Location(Bukkit.getWorld(world), i, y, i2);
-		if(l.getBlock().getType() == Material.AIR && l.add(0, -1, 0).getBlock().getType() == Material.AIR) {
+		if(l.getBlock().getType() == Material.AIR && l.add(0, 1, 0).getBlock().getType() == Material.AIR) {
 			player.teleport(l);
 			return;
 		}
