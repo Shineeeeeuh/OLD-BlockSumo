@@ -35,7 +35,7 @@ public class GeneralPlayerEvents implements Listener {
 			return;
 		}
 		User u = CoreCommon.getCommon().getUserManager().getUserByUniqueId(e.getPlayer().getUniqueId());
-		g.broadcastMessage(u.getDisplayName()+" §f: %2$s");
+		g.broadcastMessage(u.getDisplayName()+" §f: "+e.getMessage());
 	}
 	
 	@EventHandler

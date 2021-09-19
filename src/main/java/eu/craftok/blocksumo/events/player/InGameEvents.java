@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -46,6 +45,7 @@ public class InGameEvents implements Listener{
 	public void onDamage(EntityDamageEvent e) {
 		if(e.getEntity().getType() != EntityType.PLAYER) return;
 		Game g = gamemanager.getGameByPlayer((Player) e.getEntity());
+		if(g == null) return;
 		if(g.getState() == GameState.INGAME) {
 			if(e.getCause() == DamageCause.VOID) {
 				e.setCancelled(true);
@@ -154,12 +154,7 @@ public class InGameEvents implements Listener{
 	@EventHandler
     public void onConsume(PlayerItemConsumeEvent e) {
         if (e.getItem().getType().equals(Material.POTION)) {
-            Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(instance, new Runnable() {
-                @Override
-                public void run() {
-                    e.getPlayer().setItemInHand(new ItemStack(Material.AIR));
-                }
-            }, 1L);
+        	e.getPlayer().setItemInHand(new ItemStack(Material.AIR));
         }
 	}
 	

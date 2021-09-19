@@ -16,14 +16,11 @@ public class GameManager {
 	private HashMap<Integer, Game> games;
 	private AtomicInteger count = new AtomicInteger(0);
 	private int currentgame;
-	private boolean full;
 	
 	public GameManager(BlockSumo instance) {
-		pickRandomMap();
 		games = new HashMap<>();
 		playersgameid = new HashMap<>();
 		this.instance = instance;
-		this.full = false;
 	}
 	
 	public void createGame() {
@@ -32,26 +29,11 @@ public class GameManager {
 		currentgame = g.getID();
 		g.generateWorld();
 		games.put(g.getID(), g);
+		System.out.println("Creating game with map "+map.getWorld()+" with id : "+g.getID());
 		return;
 	}
 	
-	public boolean isFull() {
-		return full;
-	}
-	
-	public void setFull(boolean full) {
-		this.full = full;
-	}
-	
 	public void removeGame(int id) {
-		Game g = getGameByID(id);
-		g.deleteWorld();
-		for(String n : playersgameid.keySet()) {
-			if(getGameByPlayerName(n).getID() == id) {
-				playersgameid.remove(n);
-				continue;
-			}
-		}
 		games.remove(id);
 	}
 	

@@ -9,6 +9,7 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -32,6 +33,7 @@ import eu.craftok.blocksumo.map.MapArena;
 import eu.craftok.blocksumo.player.BSPlayer;
 import eu.craftok.blocksumo.tasks.BlockTask;
 import eu.craftok.blocksumo.tasks.BonusTask;
+import eu.craftok.blocksumo.tasks.EndTask;
 import eu.craftok.utils.PlayerUtils;
 
 public class Game {
@@ -42,19 +44,29 @@ public class Game {
 	private GameState state;
 	private BlockSumo instance;
 	private HashMap<Location, Integer> blocksplaced;
+	private ArrayList<Integer> tasks;
 	
 	public Game(BlockSumo instance, int id, MapArena map) {
-		world = id+"-"+map.getName();
+		world = id+"-"+map.getWorld();
 		this.map = map;
 		this.players = new ArrayList<>();
 		this.id = id;
 		this.instance = instance;
 		blocksplaced = new HashMap<>();
 		this.state = GameState.WAITING;
+		this.tasks = new ArrayList<>();
 	}
 	
 	public HashMap<Location, Integer> getBlocksPlaced() {
 		return blocksplaced;
+	}
+	
+	public ArrayList<Integer> getTasks() {
+		return tasks;
+	}
+	
+	public void addTask(int id) {
+		tasks.add(id);
 	}
 	
 	public int getID() {
@@ -109,8 +121,12 @@ public class Game {
 					utils.sendTitle(10, 20, 10, "§6Bonne chance !", "");
 				}
 				setState(GameState.INGAME);
-				new BonusTask(instance, g).runTaskTimer(instance, 600, 600);
-				new BlockTask(instance, g).runTaskTimer(instance, 20, 20);
+				BonusTask bt = new BonusTask(instance, g);
+				bt.runTaskTimer(instance, 600, 600);
+				BlockTask blt = new BlockTask(instance, g);
+				blt.runTaskTimer(instance, 20, 20);
+				addTask(bt.getTaskId());
+				addTask(blt.getTaskId());
 			}
 		},60L);
 	}
@@ -245,19 +261,6 @@ public class Game {
 		}
 	}
 	
-	public void deleteWorld() {
-		SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
-		SlimeLoader loader = plugin.getLoader("file");
-		try {
-			loader.deleteWorld(this.world);
-		} catch (UnknownWorldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	
 	public void setState(GameState state) {
 		this.state = state;
@@ -267,7 +270,9 @@ public class Game {
 		if(getState() == GameState.FINISH || getState() == GameState.WAITING) {
 			return;
 		}
+		Game g = this;
 		if(getAlivePlayers().size() == 1) {
+			setState(GameState.FINISH);
 			BSPlayer bsp = getAlivePlayers().get(0);
 			broadcastMessage("§c§lCRAFTOK §8» §c"+bsp.getPlayerName()+" §7a gagné !");
 			new PlayerUtils(bsp.getPlayer()).sendTitle(10, 20, 10, "§eVous avez", "§6§lGAGNÉ");
@@ -275,6 +280,7 @@ public class Game {
 			for(BSPlayer bspl : players) {
 				bspl.getPlayer().setGameMode(GameMode.SPECTATOR);
 			}
+			new EndTask(instance, g).runTaskLater(instance, 140);
 			instance.getAPI().getUserManager().getUserByName(bsp.getPlayerName()).addCoins(10);
 		}
 	}
@@ -287,7 +293,13 @@ public class Game {
 		int randomIndex = new Random().nextInt(map.getSpawns().size());
 		String[] location = map.getSpawns().get(randomIndex).split(";");
 		int i = (int) Double.parseDouble(location[0]);
+		double y = Double.parseDouble(location[1]);
 		int i2 = (int) Double.parseDouble(location[2]);
+		Location l = new Location(Bukkit.getWorld(world), i, y, i2);
+		if(l.getBlock().getType() == Material.AIR && l.add(0, -1, 0).getBlock().getType() == Material.AIR) {
+			player.teleport(l);
+			return;
+		}
 		player.teleport(Bukkit.getWorld(world).getHighestBlockAt(i, i2).getLocation());
 	}
 }

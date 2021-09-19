@@ -54,7 +54,9 @@ public class StartTask extends BukkitRunnable {
 			sendSound(Sound.LEVEL_UP, g);
 			g.start();
 			g.initWorldBorder();
-			instance.getGameManager().createGame();
+			if(instance.getGameManager().getGameNumbers() != 5) {
+				instance.getGameManager().createGame();
+			}
 			return;
 		}
 		timer--;

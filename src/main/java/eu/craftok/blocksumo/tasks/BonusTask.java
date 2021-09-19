@@ -24,6 +24,10 @@ public class BonusTask extends BukkitRunnable{
 	@Override
 	public void run() {
 		Game g = instance.getGameManager().getGameByID(gameid);
+		if(g == null) {
+			cancel();
+			return;
+		}
 		if(g.getState() == GameState.FINISH) {
 			cancel();
 			return;
