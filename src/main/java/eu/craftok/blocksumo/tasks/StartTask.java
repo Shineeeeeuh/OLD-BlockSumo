@@ -42,6 +42,7 @@ public class StartTask extends BukkitRunnable {
 		} else if(timer == 3) {
 			sendTitle("§a➌", "", g);
 			sendSound(Sound.ORB_PICKUP, g);
+			instance.getGameManager().createGame();
 		} else if(timer == 2) {
 			sendTitle("§d➋", "", g);
 			sendSound(Sound.ORB_PICKUP, g);
