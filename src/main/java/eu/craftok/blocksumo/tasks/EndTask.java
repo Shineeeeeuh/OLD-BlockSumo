@@ -33,6 +33,7 @@ public class EndTask extends BukkitRunnable{
 			Bukkit.getServer().getScheduler().cancelTask(i);
 		}
 		instance.getGameManager().removeGame(gameid);
+		instance.getGameManager().createGame();
 	}
 	
 	

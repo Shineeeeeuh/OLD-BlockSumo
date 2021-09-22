@@ -99,6 +99,7 @@ public class LobbyPlayerEvents implements Listener{
 			return;
 		}
 		if(players == 8) {
+			instance.getGameManager().createGame();
 			if(starttaskid.get(g.getID()).getTimer() > 5) {
 				starttaskid.get(g.getID()).setTimer(5);
 			}
@@ -123,6 +124,10 @@ public class LobbyPlayerEvents implements Listener{
 				}
 			}
 		}else {
+			if(g.getID() != instance.getGameManager().getCurrentGame()) {
+				instance.getGameManager().setNextGame(instance.getGameManager().getCurrentGame());
+				instance.getGameManager().setCurrentGame(g.getID());
+			}
 			g.broadcastMessage("§f"+player.getName()+" §7vient de quitter la partie §c("+g.getPlayers().size()+"/8)");
 			g.updateSB();
 			g.removePlayers(g.getPlayer(player.getName()));

@@ -45,6 +45,7 @@ public class Game {
 	private BlockSumo instance;
 	private HashMap<Location, Integer> blocksplaced;
 	private ArrayList<Integer> tasks;
+	private int timedeathmatch;
 	
 	public Game(BlockSumo instance, int id, MapArena map) {
 		world = id+"-"+map.getWorld();
@@ -55,6 +56,14 @@ public class Game {
 		blocksplaced = new HashMap<>();
 		this.state = GameState.WAITING;
 		this.tasks = new ArrayList<>();
+	}
+	
+	public int getTimeBeforeDeathmatch() {
+		return timedeathmatch;
+	}
+	
+	public void setTimeBeforeDeathMatch(int timedeathmatch) {
+		this.timedeathmatch = timedeathmatch;
 	}
 	
 	public HashMap<Location, Integer> getBlocksPlaced() {
@@ -280,12 +289,12 @@ public class Game {
 			BSPlayer bsp = getAlivePlayers().get(0);
 			broadcastMessage("§c§lCRAFTOK §8» §c"+bsp.getPlayerName()+" §7a gagné !");
 			new PlayerUtils(bsp.getPlayer()).sendTitle(10, 20, 10, "§eVous avez", "§6§lGAGNÉ");
-			bsp.getPlayer().sendMessage("§c§lCRAFTOK §8» §7Vous avez gagné §c10 coins §7!");
+			bsp.getPlayer().sendMessage("§c§lCRAFTOK §8» §7Vous avez gagné §c5 coins §7!");
 			for(BSPlayer bspl : players) {
 				bspl.getPlayer().setGameMode(GameMode.SPECTATOR);
 			}
 			new EndTask(instance, g).runTaskLater(instance, 140);
-			instance.getAPI().getUserManager().getUserByName(bsp.getPlayerName()).addCoins(10);
+			instance.getAPI().getUserManager().getUserByName(bsp.getPlayerName()).addCoins(5);
 		}
 	}
 	

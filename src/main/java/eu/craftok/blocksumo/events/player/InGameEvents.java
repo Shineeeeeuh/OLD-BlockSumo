@@ -88,6 +88,7 @@ public class InGameEvents implements Listener{
 			Player p = (Player) e.getEntity();
 			Player v = (Player) e.getDamager();
 			p.setVelocity(v.getLocation().getDirection().multiply(0.42).setY(0));
+			g.getPlayer(p.getName()).setLastDamager(v.getName());
 		}
 	}
 	
@@ -231,7 +232,7 @@ public class InGameEvents implements Listener{
 				ItemStack item = p.getInventory().getItem(i);
 				if(item == null) continue;
 				if(item.getType() == Material.FEATHER) {
-					p.sendMessage("§cVous avez déjà un boost de double jump ! Utiliser le pour en reutiliser un !");
+					p.sendMessage("§c§lCRAFTOK §8» §cVous avez déjà un boost de double jump ! Utiliser le pour en reutiliser un !");
 					e.setCancelled(true);
 					return;
 				}

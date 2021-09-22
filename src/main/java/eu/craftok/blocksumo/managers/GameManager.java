@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bukkit.entity.Player;
 
 import eu.craftok.blocksumo.BlockSumo;
+import eu.craftok.blocksumo.enums.GameState;
 import eu.craftok.blocksumo.game.Game;
 import eu.craftok.blocksumo.map.MapArena;
 
@@ -15,22 +16,51 @@ public class GameManager {
 	private HashMap<String, Integer> playersgameid;
 	private HashMap<Integer, Game> games;
 	private AtomicInteger count = new AtomicInteger(0);
-	private int currentgame;
+	private int currentgame, nextgame;
 	
 	public GameManager(BlockSumo instance) {
 		games = new HashMap<>();
 		playersgameid = new HashMap<>();
 		this.instance = instance;
+		this.nextgame = 0;
+		this.currentgame = 0;
+	}
+	
+	public void setNextGame(int nextgame) {
+		this.nextgame = nextgame;
+	}
+	
+	public int getNextGame() {
+		return nextgame;
 	}
 	
 	public void createGame() {
+		if(getGameNumbers() == 5) return;
+		if(nextgame != 0) {
+			Game g = getGameByID(currentgame);
+			if(g.getState() != GameState.INGAME) {
+				currentgame = nextgame;
+				nextgame = 0;
+			}
+			return;
+		}
 		MapArena map = pickRandomMap();
 		Game g = new Game(instance, count.getAndIncrement(), map);
-		currentgame = g.getID();
 		g.generateWorld();
 		games.put(g.getID(), g);
 		System.out.println("Creating game with map "+map.getWorld()+" with id : "+g.getID());
+		if(currentgame == 0) {
+			currentgame = g.getID();
+			return;
+		}
+		Game gc = getGameByID(currentgame);
+		if(gc.getState() != GameState.INGAME) {
+			currentgame = g.getID();
+			return;
+		}
+		nextgame = g.getID();
 		return;
+		
 	}
 	
 	public HashMap<Integer, Game> getGames() {
@@ -57,6 +87,10 @@ public class GameManager {
 	
 	public Game getGameByID(int id) {
 		return games.get(id);
+	}
+	
+	public void setCurrentGame(int currentgame) {
+		this.currentgame = currentgame;
 	}
 	
 	public Game getGameByPlayer(Player p) {

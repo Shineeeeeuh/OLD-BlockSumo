@@ -28,6 +28,7 @@ public class BSPlayer {
 	private boolean isSpectator, invicibility, vanished;
 	private BlockSumo instance;
 	private ScoreboardBuilder sb;
+	private String lastdamager;
 	
 	public BSPlayer(String player, BlockSumo instance, Game g) {
 		this.playername = player;
@@ -49,6 +50,14 @@ public class BSPlayer {
 		this.mapname = g.getMap().getWorld();
 		this.gameid = g.getID();
 		this.vanished = vanished;
+	}
+	
+	public String getLastDamager() {
+		return lastdamager;
+	}
+	
+	public void setLastDamager(String lastdamager) {
+		this.lastdamager = lastdamager;
 	}
 	
 	public boolean isVanished() {
@@ -116,7 +125,6 @@ public class BSPlayer {
 		getPlayer().closeInventory();
 		this.life = life-1;
 		if(life >= 1) {
-			g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est mort, il lui reste §c§l"+life+" §7vie(s) !");
 			g.teleport(getPlayer());
 			g.updateSB();
 			setInvicibility(true);
@@ -138,6 +146,19 @@ public class BSPlayer {
 					setInvicibility(false);
 				}
 			}, 60L);
+			if(lastdamager == null) {
+				g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est mort, il lui reste §c§l"+life+" §7vie(s) !");
+			}else {
+				g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7a était tuer par §c"+lastdamager+"§7, il lui reste §c§l"+life+" §7vie(s) !");
+				
+				Player damager = Bukkit.getPlayer(lastdamager);
+				if(damager != null) {
+					damager.sendMessage("§c§lCRAFTOK §8» §c§l+2 §7coins pour avoir tuer §c"+playername);
+					setLastDamager(null);
+					instance.getAPI().getUserManager().getUserByName(lastdamager).addCoins(2);
+				}
+				
+			}
 		}
 		if(life == 0) {
 			loadSpectator();
@@ -146,6 +167,15 @@ public class BSPlayer {
 			g.checkWin();
 			utils.sendActionBar("§cVous êtes mort !");
 			g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est éliminé(e) !");
+			if(lastdamager != null) {
+				instance.getAPI().getUserManager().getUserByName(lastdamager).addCoins(2);
+				Player damager = Bukkit.getPlayer(lastdamager);
+				if(damager != null) {
+					damager.sendMessage("§c§lCRAFTOK §8» §c§l+2 §7coins pour avoir tuer §c"+playername);
+					setLastDamager(null);
+					instance.getAPI().getUserManager().getUserByName(lastdamager).addCoins(2);
+				}
+			}
 			return;
 		}
 	}
