@@ -63,6 +63,12 @@ public class InGameEvents implements Listener{
 				e.setCancelled(true);
 				BSPlayer bsp = g.getPlayer(e.getEntity().getName());
 				bsp.kill();
+			}else {
+				if(e.getCause() == DamageCause.SUFFOCATION) {
+					e.setCancelled(true);
+					BSPlayer bsp = g.getPlayer(e.getEntity().getName());
+					bsp.kill();
+				}
 			}
 			e.setDamage(0D);
 		}else {

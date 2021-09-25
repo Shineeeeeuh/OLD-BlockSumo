@@ -58,6 +58,8 @@ public class MapArena {
 		WorldBorder worldborder = Bukkit.getWorld(world).getWorldBorder();
 		worldborder.setCenter(0, 0);
 		worldborder.setSize(60);
+		worldborder.setDamageBuffer(0);
+		worldborder.setWarningDistance(0);
 	}
 	
 }

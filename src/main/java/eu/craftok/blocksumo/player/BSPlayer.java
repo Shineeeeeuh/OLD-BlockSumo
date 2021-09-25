@@ -19,6 +19,7 @@ import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.enums.GameState;
 import eu.craftok.blocksumo.game.Game;
 import eu.craftok.blocksumo.scoreboard.ScoreboardBuilder;
+import eu.craftok.core.common.CoreCommon;
 import eu.craftok.utils.ItemCreator;
 import eu.craftok.utils.PlayerUtils;
 
@@ -50,6 +51,10 @@ public class BSPlayer {
 		this.mapname = g.getMap().getWorld();
 		this.gameid = g.getID();
 		this.vanished = vanished;
+	}
+	
+	public void setLife(int life) {
+		this.life = life;
 	}
 	
 	public String getLastDamager() {
@@ -149,13 +154,13 @@ public class BSPlayer {
 			if(lastdamager == null) {
 				g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est mort, il lui reste §c§l"+life+" §7vie(s) !");
 			}else {
-				g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7a était tuer par §c"+lastdamager+"§7, il lui reste §c§l"+life+" §7vie(s) !");
+				g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7a était tué par §c"+lastdamager+"§7, il lui reste §c§l"+life+" §7vie(s) !");
 				
 				Player damager = Bukkit.getPlayer(lastdamager);
 				if(damager != null) {
 					damager.sendMessage("§c§lCRAFTOK §8» §c§l+2 §7coins pour avoir tuer §c"+playername);
 					setLastDamager(null);
-					instance.getAPI().getUserManager().getUserByName(lastdamager).addCoins(2);
+					CoreCommon.getCommon().getUserManager().getUserByUniqueId(damager.getUniqueId()).addCoins(2);
 				}
 				
 			}
@@ -168,12 +173,11 @@ public class BSPlayer {
 			utils.sendActionBar("§cVous êtes mort !");
 			g.broadcastMessage("§c§lCRAFTOK §8» §c§l"+playername+" §7est éliminé(e) !");
 			if(lastdamager != null) {
-				instance.getAPI().getUserManager().getUserByName(lastdamager).addCoins(2);
 				Player damager = Bukkit.getPlayer(lastdamager);
 				if(damager != null) {
 					damager.sendMessage("§c§lCRAFTOK §8» §c§l+2 §7coins pour avoir tuer §c"+playername);
 					setLastDamager(null);
-					instance.getAPI().getUserManager().getUserByName(lastdamager).addCoins(2);
+					CoreCommon.getCommon().getUserManager().getUserByUniqueId(damager.getUniqueId()).addCoins(2);
 				}
 			}
 			return;

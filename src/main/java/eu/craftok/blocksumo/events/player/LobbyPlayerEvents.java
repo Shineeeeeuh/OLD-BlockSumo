@@ -129,8 +129,8 @@ public class LobbyPlayerEvents implements Listener{
 				instance.getGameManager().setCurrentGame(g.getID());
 			}
 			g.broadcastMessage("§f"+player.getName()+" §7vient de quitter la partie §c("+g.getPlayers().size()+"/8)");
-			g.updateSB();
 			g.removePlayers(g.getPlayer(player.getName()));
+			g.updateSB();
 			if(starttaskid.get(g.getID()) != null && g.getPlayers().size() == 1) {
 				starttaskid.get(g.getID()).cancel();
 				return;

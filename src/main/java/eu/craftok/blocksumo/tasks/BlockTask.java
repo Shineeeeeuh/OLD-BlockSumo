@@ -38,6 +38,18 @@ public class BlockTask extends BukkitRunnable{
 			if(bs.isVanished()) return;
             bs.updateActionBar();
         }
+		int d = g.getTimeBeforeDeathmatch();
+		if(d != -1) {
+			if(d-1 == 0) {
+				g.deathMatch();
+				g.setTimeBeforeDeathMatch(-1);
+			}else {
+				if(g.getState() == GameState.INGAME) {
+					g.decreaseTimeDeathMatch();
+				}
+			}
+		}
+		g.updateSB();
 		if(g.getBlocksPlaced().size() == 0) {
 			return;
 		}
