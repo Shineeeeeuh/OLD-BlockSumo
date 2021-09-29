@@ -47,6 +47,7 @@ public class Game {
 	private HashMap<Location, Integer> blocksplaced;
 	private ArrayList<Integer> tasks;
 	private int timedeathmatch;
+	private boolean loaded;
 	
 	public Game(BlockSumo instance, int id, MapArena map) {
 		world = id+"-"+map.getWorld();
@@ -58,6 +59,11 @@ public class Game {
 		this.state = GameState.WAITING;
 		this.tasks = new ArrayList<>();
 		this.timedeathmatch = 600;
+		this.loaded = false;
+	}
+	
+	public boolean isLoaded() {
+		return loaded;
 	}
 	
 	public int getTimeBeforeDeathmatch() {
@@ -125,6 +131,8 @@ public class Game {
 			player.loadKit();
 			player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 255));
 			player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 9999999, 255));
+			player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 9999999, 0));
+			player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 9999999, 0));
 		}
 		teleportToSpawn();
 		setState(GameState.TIMER);
@@ -264,42 +272,40 @@ public class Game {
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void generateWorld() {
-		try {
-			SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
-			SlimeLoader loader = plugin.getLoader("file");
-			SlimePropertyMap prop = new SlimePropertyMap();
-			prop.setString(SlimeProperties.DIFFICULTY, "normal");
-			prop.setInt(SlimeProperties.SPAWN_X, map.getLobby().getBlockX());
-			prop.setInt(SlimeProperties.SPAWN_Y, map.getLobby().getBlockY()+3);
-			prop.setInt(SlimeProperties.SPAWN_Z, map.getLobby().getBlockZ());
-			prop.setBoolean(SlimeProperties.ALLOW_ANIMALS, false);
-			prop.setBoolean(SlimeProperties.ALLOW_MONSTERS, false);
-			SlimeWorld world = plugin.loadWorld(loader, map.getWorld(), true, prop).clone(this.world);
-			Bukkit.getScheduler().runTaskAsynchronously(instance, new BukkitRunnable() {
-				
-				@Override
-				public void run() {
-					plugin.generateWorld(world);
-				}
-			});
-		} catch (UnknownWorldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CorruptedWorldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NewerFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (WorldInUseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+			try {
+				SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
+				SlimeLoader loader = plugin.getLoader("file");
+				SlimePropertyMap prop = new SlimePropertyMap();
+				prop.setString(SlimeProperties.DIFFICULTY, "normal");
+				prop.setInt(SlimeProperties.SPAWN_X, map.getLobby().getBlockX());
+				prop.setInt(SlimeProperties.SPAWN_Y, map.getLobby().getBlockY()+3);
+				prop.setInt(SlimeProperties.SPAWN_Z, map.getLobby().getBlockZ());
+				prop.setBoolean(SlimeProperties.ALLOW_ANIMALS, false);
+				prop.setBoolean(SlimeProperties.ALLOW_MONSTERS, false);
+				SlimeWorld world = plugin.loadWorld(loader, map.getWorld(), true, prop).clone(this.world);
+				Bukkit.getScheduler().runTask(instance, () -> {
+						plugin.generateWorld(world);
+						this.loaded = true;
+				});
+			} catch (UnknownWorldException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (CorruptedWorldException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NewerFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (WorldInUseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 	}
 	
 	

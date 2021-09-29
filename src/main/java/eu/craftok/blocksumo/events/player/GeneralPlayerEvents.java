@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.server.ServerListPingEvent;
 
 import eu.craftok.blocksumo.BlockSumo;
+import eu.craftok.blocksumo.enums.GameState;
 import eu.craftok.blocksumo.game.Game;
 import eu.craftok.blocksumo.player.BSPlayer;
 import eu.craftok.core.common.CoreCommon;
@@ -45,8 +46,10 @@ public class GeneralPlayerEvents implements Listener {
 	
 	@EventHandler
 	public void onServerListPing(ServerListPingEvent e) {
-		if(instance.getGameManager().getGameNumbers() == 5) {
-			e.setMotd("INGAME");
+		if(instance.getGameManager().getGamePlayNumbers() == 5 || instance.getGameManager().getGameCreated() == 10) {
+			if(instance.getGameManager().getGameByID(instance.getGameManager().getCurrentGame()).getState() != GameState.WAITING) {
+				e.setMotd("INGAME");
+			}
 		}else {
 			e.setMotd("ONLINE");
 		}

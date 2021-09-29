@@ -13,6 +13,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -38,6 +40,17 @@ public class LobbyPlayerEvents implements Listener{
 	
 	public static HashMap<Integer, StartTask> getStartTaskID() {
 		return starttaskid;
+	}
+	
+	@EventHandler
+	public void onConnect(PlayerLoginEvent e) {
+		Player p = e.getPlayer();
+		if(instance.getGameManager().isDisconnect()) {
+			if(!instance.isVanished(p)) {
+				e.disallow(Result.KICK_OTHER, "§cLa partie se génère !");
+				e.setResult(Result.KICK_OTHER);
+			}
+		}
 	}
 	
 	

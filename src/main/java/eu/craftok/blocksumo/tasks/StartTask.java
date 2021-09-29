@@ -42,7 +42,6 @@ public class StartTask extends BukkitRunnable {
 		} else if(timer == 3) {
 			sendTitle("§a➌", "", g);
 			sendSound(Sound.ORB_PICKUP, g);
-			instance.getGameManager().createGame();
 		} else if(timer == 2) {
 			sendTitle("§d➋", "", g);
 			sendSound(Sound.ORB_PICKUP, g);
@@ -55,8 +54,10 @@ public class StartTask extends BukkitRunnable {
 			sendSound(Sound.LEVEL_UP, g);
 			g.start();
 			g.initWorldBorder();
-			if(instance.getGameManager().getGameNumbers() != 5) {
-				instance.getGameManager().createGame();
+			if(instance.getGameManager().getGamePlayNumbers() != 5 || instance.getGameManager().getGameCreated() > 10) {
+				if(instance.getGameManager().getGameByID(instance.getGameManager().getCurrentGame()).getState() != GameState.WAITING) {
+					instance.getGameManager().createGame();
+				}
 			}
 			return;
 		}

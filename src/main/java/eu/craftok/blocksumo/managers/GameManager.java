@@ -35,7 +35,7 @@ public class GameManager {
 	}
 	
 	public void createGame() {
-		if(getGameNumbers() == 5) return;
+		if(getGamePlayNumbers() == 5 || getGameCreated() == 10) return;
 		if(nextgame != 0) {
 			Game g = getGameByID(currentgame);
 			if(g.getState() != GameState.INGAME) {
@@ -71,6 +71,14 @@ public class GameManager {
 		games.remove(id);
 	}
 	
+	public boolean isDisconnect() {
+		if(getGameByID(currentgame).isLoaded()) {
+			return false;
+		}else {
+			return true;
+		}
+	}
+	
 	public Game getGameByWorld(String world) {
 		for(Game g : games.values()) {
 			if(g.getWorld().equalsIgnoreCase(world)) {
@@ -81,8 +89,18 @@ public class GameManager {
 		return null;
 	}
 	
-	public int getGameNumbers() {
-		return games.size();
+	public int getGamePlayNumbers() {
+		int i = 0;
+		for(Game g : games.values()) {
+			if(g.getState() != GameState.WAITING) {
+				i++;
+			}
+		}
+		return i;
+	}
+	
+	public int getGameCreated() {
+		return games.values().size();
 	}
 	
 	public Game getGameByID(int id) {
