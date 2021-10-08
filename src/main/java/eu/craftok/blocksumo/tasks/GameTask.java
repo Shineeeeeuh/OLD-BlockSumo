@@ -13,12 +13,12 @@ import eu.craftok.blocksumo.enums.GameState;
 import eu.craftok.blocksumo.game.Game;
 import eu.craftok.blocksumo.player.BSPlayer;
 
-public class BlockTask extends BukkitRunnable{
+public class GameTask extends BukkitRunnable{
 	
 	private BlockSumo instance;
 	private int gameid;
 
-	public BlockTask(BlockSumo instance, Game g) {
+	public GameTask(BlockSumo instance, Game g) {
 		this.instance = instance;
 		this.gameid = g.getID();
 	}
@@ -49,7 +49,6 @@ public class BlockTask extends BukkitRunnable{
 				}
 			}
 		}
-		g.updateSB();
 		if(g.getBlocksPlaced().size() == 0) {
 			return;
 		}

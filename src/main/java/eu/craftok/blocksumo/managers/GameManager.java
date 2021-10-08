@@ -54,6 +54,10 @@ public class GameManager {
 			return;
 		}
 		Game gc = getGameByID(currentgame);
+		if(gc == null) {
+			currentgame = g.getID();
+			return;
+		}
 		if(gc.getState() != GameState.INGAME) {
 			currentgame = g.getID();
 			return;

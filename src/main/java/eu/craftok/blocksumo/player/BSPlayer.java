@@ -159,8 +159,8 @@ public class BSPlayer {
 				Player damager = Bukkit.getPlayer(lastdamager);
 				if(damager != null) {
 					damager.sendMessage("§c§lCRAFTOK §8» §c§l+2 §7coins pour avoir tuer §c"+playername);
-					setLastDamager(null);
 					CoreCommon.getCommon().getUserManager().getUserByUniqueId(damager.getUniqueId()).addCoins(2);
+					setLastDamager(null);
 				}
 				
 			}
@@ -237,7 +237,17 @@ public class BSPlayer {
 	public void updateActionBar() {
         PlayerUtils utils = new PlayerUtils(getPlayer());
         if (this.life >= 1) {
-            utils.sendActionBar("§f" + this.life + " §c\u2764 §7restante(s).");
+        	int i = instance.getGameManager().getGameByID(gameid).getTimeBeforeDeathmatch();
+        	if(i == -1) {
+        		utils.sendActionBar("§f" + this.life + " §c\u2764 §7restante(s) | §fDeathMatch §3» §b§lActiver");
+        	}else {
+        		int d = (i-((i/60)*60));
+        		if(d < 10) {
+        			utils.sendActionBar("§f" + this.life + " §c\u2764 §7restante(s) | §fDeathMatch §3» §b"+i/60+":0"+d);
+        		}else {
+        			utils.sendActionBar("§f" + this.life + " §c\u2764 §7restante(s) | §fDeathMatch §3» §b"+i/60+":"+d);
+        		}
+        	}
             return;
         }
         utils.sendActionBar("§cVous êtes mort !");

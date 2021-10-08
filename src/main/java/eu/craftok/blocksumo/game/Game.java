@@ -31,7 +31,7 @@ import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.enums.GameState;
 import eu.craftok.blocksumo.map.MapArena;
 import eu.craftok.blocksumo.player.BSPlayer;
-import eu.craftok.blocksumo.tasks.BlockTask;
+import eu.craftok.blocksumo.tasks.GameTask;
 import eu.craftok.blocksumo.tasks.BonusTask;
 import eu.craftok.blocksumo.tasks.EndTask;
 import eu.craftok.core.common.CoreCommon;
@@ -155,7 +155,7 @@ public class Game {
 				setState(GameState.INGAME);
 				BonusTask bt = new BonusTask(instance, g);
 				bt.runTaskTimer(instance, 600, 600);
-				BlockTask blt = new BlockTask(instance, g);
+				GameTask blt = new GameTask(instance, g);
 				blt.runTaskTimer(instance, 20, 20);
 				addTask(bt.getTaskId());
 				addTask(blt.getTaskId());
@@ -223,20 +223,6 @@ public class Game {
 		    }
 		}
 		lines.add(" ");
-		if (getState() == GameState.INGAME || getState() == GameState.TIMER || getState() == GameState.FINISH) {
-			int i = getTimeBeforeDeathmatch();
-			if(i == -1) {
-				lines.add("§fDeathMatch §3» §b§lActiver");
-			}else {
-				int d = (i-((i/60)*60));
-				if(d < 10) {
-					lines.add("§fDeathMatch §3» §b"+i/60+":0"+(i-((i/60)*60)));
-				}else {
-					lines.add("§fDeathMatch §3» §b"+i/60+":"+(i-((i/60)*60)));
-				}
-			}
-			lines.add(" ");
-		}
 		lines.add("§c§lJEU");
 		lines.add(" §fMode §3» §bSolo");
 		lines.add(" §fMap §3» §b" + map.getWorld());
