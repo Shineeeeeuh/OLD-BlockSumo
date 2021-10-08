@@ -1,0 +1,7 @@
+name: Craftok-BlockSumo
+version: D-0.0.1
+author: Shineeeeeuh
+main: eu.craftok.blocksumo.BlockSumo
+depends: ['Craftok-Core', 'SlimeWorldManager']
+commands:
+   start:
