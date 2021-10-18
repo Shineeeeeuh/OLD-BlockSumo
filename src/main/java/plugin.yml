@@ -1,0 +1,7 @@
+name: Craftok-BlockSumo
+version: REL-1.0.0
+author: Shineeeeeuh
+main: eu.craftok.blocksumo.BlockSumo
+depends: ['Craftok-Core']
+commands:
+   start:
