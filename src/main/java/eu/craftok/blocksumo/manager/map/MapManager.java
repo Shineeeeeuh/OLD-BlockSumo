@@ -33,12 +33,11 @@ public class MapManager {
 	public void loadMap(File f) {
 		FileConfiguration fc = YamlConfiguration.loadConfiguration(f);
 		int posnb = fc.getInt("positions.length");
-		System.out.println(fc.getString("locations.bonus"));
 		ArrayList<String> locations = new ArrayList<String>();
 		for(int i = 1; i <= posnb; i++) {
 			locations.add(fc.getString("positions."+i));
 		}
-		maps.add(new Map(f.getName(), locations, fc.getString("locations.lobby"), fc.getString("world.file"), fc.getString("locations.bonus")));
+		maps.add(new Map(f.getName().replaceAll(".yml", ""), locations, fc.getString("locations.lobby"), fc.getString("world.file"), fc.getString("locations.bonus")));
 	}
 
 	 public File getMapFolder() {

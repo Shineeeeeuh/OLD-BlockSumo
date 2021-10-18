@@ -23,7 +23,7 @@ public class BSPlayerManager {
 	public static void removePlayer(String name) {
 		BSPlayer bp = getPlayer(name);
 		if(!bp.isSpectator()) {
-			playerssize++;
+			playerssize--;
 		}
 		players.remove(name);
 	}
