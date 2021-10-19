@@ -33,8 +33,8 @@ public class BonusManager {
 	}
 	
 	public static ItemStack getMegaRandomItems() {
-		int randomIndex = new Random().nextInt(normalitems.size());
-		return normalitems.get(randomIndex);
+		int randomIndex = new Random().nextInt(megaitems.size());
+		return megaitems.get(randomIndex);
 	}
 	
 	private static ItemStack getCustomPotion(PotionEffectType type, int dura, int amp, String name) {

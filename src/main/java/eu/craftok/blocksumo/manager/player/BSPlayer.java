@@ -31,7 +31,7 @@ public class BSPlayer {
 	public BSPlayer(String name) {
 		this.name = name;
 		this.life = 5;
-		this.invincibility = true;
+		this.invincibility = false;
 		this.lastdamager = null;
 		this.spectator = false;
 	}
@@ -132,7 +132,7 @@ public class BSPlayer {
 			if(TimerManager.isFinished("deathmatch")) {
 				utils.sendActionBar("§f" + this.life + " §c\u2764 §7restante(s) | §fDeathMatch §3» §b§lActiver");
 			}else {
-				utils.sendActionBar("§f" + this.life + " §c\u2764 §7restante(s) | §fDeathMatch §3» §b"+TimerManager.getTimeBeforeFinish("deeathmatch"));
+				utils.sendActionBar("§f" + this.life + " §c\u2764 §7restante(s) | §fDeathMatch §3» §b"+TimerManager.getTimeBeforeFinish("deathmatch"));
 			}
 			return;
 		}else {
@@ -181,6 +181,7 @@ public class BSPlayer {
 			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+name+" §7est éliminé(e) !");
 			new PlayerUtils(p).sendTitle(10, 20, 10, "§c§lVous avez", "§c§lPERDU");
 			BlockSumo.getInstance().getGameManager().checkWin();
+			BSPlayerManager.updateSB();
 			return;
 		}else {
 			Player p = getPlayer();
@@ -210,8 +211,8 @@ public class BSPlayer {
 					CoreCommon.getCommon().getUserManager().getUserByUniqueId(damager.getUniqueId()).addCoins(2);
 					setLastDamager(null);
 				}
-				
 			}
+			BSPlayerManager.updateSB();
 		}
 	}
 }

@@ -67,23 +67,30 @@ public class GameManager {
 		BSPlayerManager.getAlivePlayers().forEach(bp -> {
 			Player p = bp.getPlayer();
 			int r = new Random().nextInt(locs.size());
+			p.getInventory().clear();
 			p.teleport(locs.get(r));
 			locs.remove(r);
-			p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999, 0));
-			p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 99999, 0));
-			p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 99999, 255));
+			p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999, 0, false));
+			p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 99999, 250, false));
+			p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 99999, 250));
+			p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 99999, 250));
+			p.setFlySpeed(0.0F);
 			new PlayerUtils(p).sendTitle(10, 20, 10, "§6Préparation", "§e(Patientez...)");
 		});
+		BSPlayerManager.updateSB();
 		Bukkit.getScheduler().runTaskLater(instance, () -> {
 			state = STATE.INGAME;
 			BSPlayerManager.getAlivePlayers().forEach(bp -> {
 				Player p = bp.getPlayer();
+				bp.loadKit();
 				p.getActivePotionEffects().forEach(po -> p.removePotionEffect(po.getType()));
+				p.setFlySpeed(0.2F);
 				PlayerUtils u = new PlayerUtils(p);
 				u.sendTitle(10, 20, 10, "§eBonne chance !", null);
 				u.sendSound(Sound.ENDERDRAGON_GROWL, 1F);
 				new GameTask().runTaskTimer(instance, 0, 20L);
 			});
+			BSPlayerManager.updateSB();
 		}, 80);
 	}
 	
@@ -92,7 +99,7 @@ public class GameManager {
 			state = STATE.FINISH;
 			Bukkit.getScheduler().cancelAllTasks();
 			Player p = BSPlayerManager.getAlivePlayers().get(0).getPlayer();
-			p.setGameMode(GameMode.ADVENTURE);
+			p.setGameMode(GameMode.SPECTATOR);
 			new PlayerUtils(p).sendTitle(10, 20, 10, "§6Tu as gagné !", "§eBien jouer !");
 			new PlayerUtils(p).sendSound(Sound.LEVEL_UP, 1F);
 			FireworkBuilder.summonInstantFirework(FireworkUtils.getRandomFireworkEffect(), playedmap.getBonus());
@@ -104,7 +111,7 @@ public class GameManager {
 			CoreCommon.getCommon().getUserManager().getUserByName(p.getName()).addCoins(5);
 			p.sendMessage("§c§lCRAFTOK §8» §7Vous avez gagné §c5 coins §7!");
 			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c"+p.getName()+" §7a gagné !");
-			new EndTask().runTaskLater(instance, 140);
+			new EndTask().runTaskLater(instance, 160);
 		}
 	}
 	

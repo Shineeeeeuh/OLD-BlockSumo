@@ -1,10 +1,10 @@
 package eu.craftok.blocksumo.events;
 
+import java.awt.Color;
 import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -30,6 +30,8 @@ import eu.craftok.blocksumo.manager.GameManager.STATE;
 import eu.craftok.blocksumo.manager.player.BSPlayer;
 import eu.craftok.blocksumo.manager.player.BSPlayerManager;
 import eu.craftok.utils.PlayerUtils;
+import eu.craftok.utils.particles.ParticleUtils;
+import eu.craftok.utils.particles.Particles;
 
 public class InGameEvents implements Listener {
 	
@@ -102,7 +104,7 @@ public class InGameEvents implements Listener {
 			if(act != Action.RIGHT_CLICK_AIR && act != Action.RIGHT_CLICK_BLOCK) return;
 			e.getPlayer().setVelocity(e.getPlayer().getLocation().getDirection().multiply(1.5).setY(1.25));
 			new PlayerUtils(e.getPlayer()).sendSound(Sound.FIREWORK_LAUNCH, 1F);
-			e.getPlayer().getWorld().playEffect(e.getPlayer().getLocation(), Effect.SMOKE, 5);
+			ParticleUtils.drawParticleLine(e.getPlayer().getLocation().add(2, 0, 0), e.getPlayer().getLocation().subtract(2, 0, 2), Particles.FLAME, 15, Color.WHITE);
 			e.getPlayer().getWorld().strikeLightningEffect(e.getPlayer().getLocation());
 			if(e.getPlayer().getItemInHand().getAmount()-1 == 0) {
 				e.getPlayer().setItemInHand(null);

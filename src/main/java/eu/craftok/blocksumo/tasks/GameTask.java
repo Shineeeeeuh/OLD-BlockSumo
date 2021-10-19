@@ -13,8 +13,8 @@ public class GameTask extends BukkitRunnable{
 
 	@Override
 	public void run() {
-		TimerManager.updateTimers();
 		BSPlayerManager.updateActionBar();
+		TimerManager.updateTimers();
 		if(!BlockSumo.getInstance().getGameManager().getBlocks().isEmpty()) {
 			Lists.newArrayList(BlockSumo.getInstance().getGameManager().getBlocks().keySet()).forEach(l -> {
 				int i = BlockSumo.getInstance().getGameManager().getBlocks().get(l);

@@ -17,7 +17,7 @@ public class DeathMatchTimer extends Timer{
 
 	@Override
 	public int getTime() {
-		return 600;
+		return 750;
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class DeathMatchTimer extends Timer{
 		WorldBorder wb = Bukkit.getWorld(BlockSumo.getInstance().getGameManager().getPlayedMap().getWorld()).getWorldBorder();
 		wb.setDamageAmount(5);
 		wb.setDamageBuffer(0);
-		wb.setSize(7,30);
+		wb.setSize(10,60);
 		Bukkit.broadcastMessage("§c§lCraftok §8» §cLe §c§lDEATCHMATCH §ccommence !");
 	}
 

@@ -24,11 +24,13 @@ public class TimerManager {
 	public static void updateTimers() {
 		if(getLaunchedTimer().size() == 0) return;
 		getLaunchedTimer().forEach(t -> {
-			int i = getSecondsBeforeFinish(t.getID());
+			int i = timerstime.get(t.getID());
 			if(i-1 == 0) {
 				t.run();
 				if(t.isRepeatable()) {
 					timerstime.put(t.getID(), t.getTime());
+				}else {
+					t.setFinished(true);
 				}
 				return;
 			}else {

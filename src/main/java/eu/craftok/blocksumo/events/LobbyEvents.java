@@ -43,19 +43,14 @@ public class LobbyEvents implements Listener {
 			BSPlayerManager.updateSB();
 			int players = BSPlayerManager.getPlayersNB();
 			e.setJoinMessage("§f"+p.getName()+" §7vient de rejoindre la partie §a("+players+"/8)");
-			Bukkit.getScheduler().runTaskLater(BlockSumo.getInstance(), () -> {
-				Location l = BlockSumo.getInstance().getGameManager().getPlayedMap().getLobby();
-				p.teleport(l);
-				p.setGameMode(GameMode.SURVIVAL);
-			}, 1);
 			if(timer != 0) {
 				if(players == 8) {
 					if(StartTask.getTimer() > 3) {
 						StartTask.setTimer(3);
-					}else if(players == 5) {
-						if(StartTask.getTimer() > 30) {
-							StartTask.setTimer(30);
-						}
+					}
+				}else if(players == 5) {
+					if(StartTask.getTimer() > 30) {
+						StartTask.setTimer(30);
 					}
 				}
 			}else if(players == 2) {
@@ -64,6 +59,11 @@ public class LobbyEvents implements Listener {
 				timer = st.getTaskId();
 			}
 		}
+		Bukkit.getScheduler().runTaskLater(BlockSumo.getInstance(), () -> {
+			Location l = BlockSumo.getInstance().getGameManager().getPlayedMap().getLobby();
+			p.teleport(l);
+			p.setGameMode(GameMode.SURVIVAL);
+		}, 1);
 	}
 	
 	@EventHandler

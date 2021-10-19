@@ -29,7 +29,7 @@ public class MegaBonusTask extends BukkitRunnable{
 			cancel();
 		}
 		Map m = BlockSumo.getInstance().getGameManager().getPlayedMap();
-		ParticleUtils.playCircle(Particles.FLAME, m.getBonus().add(0, 1, 0), 2, 1);
+		ParticleUtils.playCircle(Particles.FLAME, m.getBonus().add(0, 1, 0), 1, 1);
 		Collection<Entity> entities = Bukkit.getWorld(m.getWorld()).getNearbyEntities(m.getBonus(), 1, 2, 1);
 		if(entities.size() == 0) {
 			if(lastplayer != null) {
@@ -39,7 +39,14 @@ public class MegaBonusTask extends BukkitRunnable{
 			time = 0;
 			return;
 		}else {
-			Player p = (Player) entities.stream().filter(e -> e instanceof Player && e.getLocation().getBlock().getType() == Material.GOLD_BLOCK).findFirst().get();
+			Player p = (Player) entities.stream().filter(e -> e instanceof Player && e.getLocation().subtract(0, 1, 0).getBlock().getType() == Material.GOLD_BLOCK).findFirst().get();
+			if(p == null) {
+				if(lastplayer != null) {
+					Bukkit.broadcastMessage("§c§lCraftok §8» §c§l"+lastplayer+" §ca perdu le contrôle du MegaBonus !");
+				}
+				lastplayer = null;
+				time = 0;
+			}
 			if(lastplayer == p.getName()) {
 				if((time+1)/5 == 5) {
 					p.getInventory().addItem(BonusManager.getMegaRandomItems());
@@ -76,7 +83,7 @@ public class MegaBonusTask extends BukkitRunnable{
 				continue;
 			}
 		}
-		new PlayerUtils(p).sendTitle(0, 4, 0, "§f["+sb.toString()+"§f]", null);
+		new PlayerUtils(p).sendTitle(0, 10, 0, "§f["+sb.toString()+"§f]", null);
 	}
 	
 }

@@ -26,14 +26,14 @@ public class StartTask extends BukkitRunnable {
 			sendTitle("§64", "");
 			sendSound(Sound.ORB_PICKUP);
 		} else if(timer == 3) {
-			sendTitle("§6u\2778", "");
+			sendTitle("§6\u2778", "");
 			sendSound(Sound.ORB_PICKUP);
 			ProtectionEvents.closed = true;
 		} else if(timer == 2) {
-			sendTitle("§eu\2777", "");
+			sendTitle("§e\u2777", "");
 			sendSound(Sound.ORB_PICKUP);
 		} else if(timer == 1) {
-			sendTitle("§cu\2776", "");
+			sendTitle("§c\u2776", "");
 			sendSound(Sound.ORB_PICKUP);
 		} else if(timer == 0) {
 			BlockSumo.getInstance().getGameManager().startGame();

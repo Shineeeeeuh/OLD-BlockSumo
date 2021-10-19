@@ -1,13 +1,14 @@
 package eu.craftok.blocksumo.events;
 
-import java.util.Random;
-
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -28,6 +29,13 @@ public class ProtectionEvents implements Listener {
 	
 	@EventHandler
 	public void onWeather(WeatherChangeEvent e) {
+		e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onDamage(EntityDamageEvent e) {
+		GameManager g = BlockSumo.getInstance().getGameManager();
+		if(g.getState() != STATE.LOBBY) return;
 		e.setCancelled(true);
 	}
 	
@@ -72,10 +80,8 @@ public class ProtectionEvents implements Listener {
 		if(g.getState() == STATE.LOBBY || g.getState() == STATE.WAITING) {
 			e.setCancelled(true);
 		}else {
-			e.setCancelled(true);
 			if(e.getBlock().getType() == Material.WOOL) {
 				if(g.getBlocks().containsKey(e.getBlock().getLocation())) {
-					e.getBlock().getLocation().getBlock().setType(Material.AIR);
 					g.getBlocks().remove(e.getBlock().getLocation());
 				}
 			}
@@ -87,20 +93,23 @@ public class ProtectionEvents implements Listener {
 		e.setCancelled(true);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlace(BlockPlaceEvent e) {
 		GameManager g = BlockSumo.getInstance().getGameManager();
 		if(g.getState() == STATE.LOBBY || g.getState() == STATE.WAITING) {
 			e.setCancelled(true);
 		}else {
-			e.setCancelled(true);
 			if(e.getBlock().getType() == Material.WOOL) {
+				e.getPlayer().getItemInHand().setAmount(64);
 				g.getBlocks().put(e.getBlock().getLocation(), 0);
-				e.getBlock().getLocation().getBlock().setType(Material.WOOL);
-				e.getBlock().getLocation().getBlock().setData((byte) new Random().nextInt(15));
 			}
 		}
+	}
+	
+	@EventHandler
+	public void onSpawn(EntitySpawnEvent e) {
+		if(e.getEntityType() != EntityType.ENDER_DRAGON && e.getEntityType() != EntityType.DROPPED_ITEM) e.setCancelled(true);
+		return;
 	}
 	
 	@EventHandler
