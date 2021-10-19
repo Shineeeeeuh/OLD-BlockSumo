@@ -32,7 +32,7 @@ public class TimerManager {
 				}else {
 					t.setFinished(true);
 				}
-				return;
+				
 			}else {
 				timerstime.put(t.getID(), i-1);
 			}

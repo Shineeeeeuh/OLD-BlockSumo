@@ -88,8 +88,8 @@ public class GameManager {
 				PlayerUtils u = new PlayerUtils(p);
 				u.sendTitle(10, 20, 10, "§eBonne chance !", null);
 				u.sendSound(Sound.ENDERDRAGON_GROWL, 1F);
-				new GameTask().runTaskTimer(instance, 0, 20L);
 			});
+			new GameTask().runTaskTimer(instance, 0, 20L);
 			BSPlayerManager.updateSB();
 		}, 80);
 	}
