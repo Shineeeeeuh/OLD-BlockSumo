@@ -9,9 +9,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -79,7 +81,7 @@ public class InGameEvents implements Listener {
 			}
 			if(e.getDamager() instanceof Player) {
 				Player d = (Player) e.getDamager();
-				p.setVelocity(d.getLocation().getDirection().multiply(0.42).setY(0));
+				p.setVelocity(d.getLocation().getDirection().setY(0).normalize().multiply(0.12));
 				b.setLastDamager(d.getName());
 			}
 		}
@@ -115,6 +117,23 @@ public class InGameEvents implements Listener {
 			return;
 		}
 		return;
+	}
+	
+	@EventHandler
+    public void onDamageByOtherEntity(EntityDamageByEntityEvent e) {
+		if (e.getDamager() instanceof TNTPrimed && e.getEntity() instanceof Player) {
+			TNTPrimed tnt = (TNTPrimed) e.getDamager();
+			Player player = (Player) e.getEntity();
+			 for (Entity entity : tnt.getNearbyEntities(1.5, 1.5, 1.5)) {
+				 if(entity instanceof Player) {
+					 Player p = (Player) entity;
+					 if(!p.equals(player)) {
+						 continue;
+					 }
+					 player.setVelocity(player.getLocation().getDirection().multiply(0.7).setY(0.7));
+				 }
+			 }
+		}
 	}
 	
 	@EventHandler

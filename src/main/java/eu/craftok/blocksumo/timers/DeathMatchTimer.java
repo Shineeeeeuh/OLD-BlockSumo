@@ -10,17 +10,14 @@ import eu.craftok.blocksumo.manager.timers.Timer;
 import eu.craftok.utils.PlayerUtils;
 
 public class DeathMatchTimer extends Timer{
-
-	private int time;
 	
-	public DeathMatchTimer(int time) {
+	public DeathMatchTimer() {
 		super("deathmatch", false);
-		this.time = time;
 	}
 
 	@Override
 	public int getTime() {
-		return time;
+		return 300;
 	}
 
 	@Override

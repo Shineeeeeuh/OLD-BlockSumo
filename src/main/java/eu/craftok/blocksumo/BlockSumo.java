@@ -22,8 +22,6 @@ public class BlockSumo extends JavaPlugin{
 	
 	@Override
 	public void onEnable() {
-		getConfig().options().copyDefaults(true);
-		saveConfig();
 		this.map = new MapManager(this);
 		this.gamemanager = new GameManager(this);
 		instance = this;
@@ -34,10 +32,10 @@ public class BlockSumo extends JavaPlugin{
 	}
 	
 	public void registerAllTimers() {
-		TimerManager.registerTimer(new DeathMatchTimer(getConfig().getInt("time.deathmatch")));
+		TimerManager.registerTimer(new DeathMatchTimer());
 		TimerManager.registerTimer(new MegaBonusTimer());
 		TimerManager.registerTimer(new BonusTimer());
-		TimerManager.registerTimer(new DragonTimer(getConfig().getInt("time.dragon")));
+		TimerManager.registerTimer(new DragonTimer());
 	}
 	
 	public static BlockSumo getInstance() {

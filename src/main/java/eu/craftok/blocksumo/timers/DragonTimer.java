@@ -17,17 +17,14 @@ import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
 
 public class DragonTimer extends Timer{
-
-	private int time;
 	
-	public DragonTimer(int time) {
+	public DragonTimer() {
 		super("dragon", false);
-		this.time = time;
 	}
 
 	@Override
 	public int getTime() {
-		return time;
+		return 420;
 	}
 
 	@Override
