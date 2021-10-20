@@ -10,8 +10,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.manager.GameManager;
@@ -35,6 +35,17 @@ public class LobbyEvents implements Listener {
 			BSPlayerManager.addPlayer(bp);
 			return;
 		}else {
+			if(BlockSumo.getInstance().getGameManager().getState() != STATE.LOBBY && (p.hasPermission("craftok.mod") || p.hasPermission("craftok.admin"))) {
+				e.setJoinMessage(null);
+				BSPlayer bp = new BSPlayer(p.getName(), true);
+				bp.initSB();
+				BSPlayerManager.addPlayer(bp);
+				p.teleport(BlockSumo.getInstance().getGameManager().getPlayedMap().getBonus().add(0, 3, 0));
+				Bukkit.getScheduler().runTaskLater(BlockSumo.getInstance(), () -> {
+					p.setGameMode(GameMode.SPECTATOR);
+				}, 1);
+				return;
+			}
 			BSPlayer bp = new BSPlayer(p.getName());
 			BSPlayerManager.addPlayer(bp);
 			bp.initPlayerAbilities();
@@ -99,17 +110,6 @@ public class LobbyEvents implements Listener {
 		}
 	}
 	
-	@EventHandler
-	public void onLogin(PlayerLoginEvent e) {
-		Player p = e.getPlayer();
-		if(isVanished(p)) return;
-		if(BlockSumo.getInstance().getGameManager().getState() != STATE.LOBBY) {
-			e.disallow(Result.KICK_OTHER, "§cLa partie a déjà commencer !");
-			e.setResult(Result.KICK_OTHER);
-			return;
-		}
-	}
-	
 	public boolean isVanished(Player p) {
 		if(p != null && p.hasMetadata("vanished") && !p.getMetadata("vanished").isEmpty()) {
 			return p.getMetadata("vanished").get(0).asBoolean();
@@ -130,5 +130,14 @@ public class LobbyEvents implements Listener {
 			return;
 		}
 		return;
+	}
+	
+	@EventHandler
+	public void onLogin(PlayerLoginEvent e) {
+		Player p = e.getPlayer();
+		if(BlockSumo.getInstance().getGameManager().getState() != STATE.LOBBY && (!p.hasPermission("craftok.mod") || !p.hasPermission("craftok.admin"))) {
+			e.disallow(Result.KICK_OTHER, "§cDésolé, de vous le dire, mais vous ne pouvez pas spec la partie !");
+			e.setResult(Result.KICK_OTHER);
+		}
 	}
 }

@@ -22,7 +22,8 @@ public class BlockSumo extends JavaPlugin{
 	
 	@Override
 	public void onEnable() {
-		saveDefaultConfig();
+		getConfig().options().copyDefaults(true);
+		saveConfig();
 		this.map = new MapManager(this);
 		this.gamemanager = new GameManager(this);
 		instance = this;

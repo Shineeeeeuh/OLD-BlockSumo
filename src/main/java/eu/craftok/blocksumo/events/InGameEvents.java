@@ -171,12 +171,15 @@ public class InGameEvents implements Listener {
 			Iterator<Block> it = d.iterator();
 			while (it.hasNext()) {
 				Block b = (Block) it.next();
+				
 				if(!(b.getType() == Material.WOOL)) {
 					it.remove();
 				}else {
 					if(g.getBlocks().containsKey(b.getLocation())) {
 						g.getBlocks().remove(b.getLocation());
+						b.setType(Material.AIR);
 					}
+					it.remove();
 				}
 			}
 		}

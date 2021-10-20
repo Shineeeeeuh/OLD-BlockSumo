@@ -11,7 +11,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.server.ServerListPingEvent;
@@ -66,11 +65,6 @@ public class ProtectionEvents implements Listener {
 	
 	@EventHandler
 	public void onDrop(PlayerDropItemEvent e) {
-		e.setCancelled(true);
-	}
-	
-	@EventHandler
-	public void onInventoryClick(InventoryClickEvent e) {
 		e.setCancelled(true);
 	}
 	
