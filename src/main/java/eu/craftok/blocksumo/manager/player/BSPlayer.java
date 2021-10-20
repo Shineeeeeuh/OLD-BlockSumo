@@ -203,7 +203,7 @@ public class BSPlayer {
 			if(lastdamager == null) {
 				Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+name+" §7est mort, il lui reste §c§l"+life+" §7vie(s) !");
 			}else {
-				Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+name+" §7a était tuer par §c"+lastdamager+"§7, il lui reste §c§l"+life+" §7vie(s) !");
+				Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+name+" §7a été tuer par §c"+lastdamager+"§7, il lui reste §c§l"+life+" §7vie(s) !");
 				
 				Player damager = Bukkit.getPlayer(lastdamager);
 				if(damager != null) {

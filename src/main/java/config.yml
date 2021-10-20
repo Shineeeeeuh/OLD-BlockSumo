@@ -1,0 +1,4 @@
+times:
+   #Tous les temps doivent être en secondes (1 minute = 60 secondes)
+   deathmatch: 450
+   dragon: 900

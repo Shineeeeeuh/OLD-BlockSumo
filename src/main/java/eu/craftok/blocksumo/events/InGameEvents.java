@@ -29,6 +29,7 @@ import eu.craftok.blocksumo.manager.GameManager;
 import eu.craftok.blocksumo.manager.GameManager.STATE;
 import eu.craftok.blocksumo.manager.player.BSPlayer;
 import eu.craftok.blocksumo.manager.player.BSPlayerManager;
+import eu.craftok.blocksumo.manager.timers.TimerManager;
 import eu.craftok.utils.PlayerUtils;
 import eu.craftok.utils.particles.ParticleUtils;
 import eu.craftok.utils.particles.Particles;
@@ -47,7 +48,7 @@ public class InGameEvents implements Listener {
 			
 			//TODO : KILL DETECT
 			
-			if(e.getCause() == DamageCause.VOID || e.getCause() == DamageCause.SUFFOCATION) {
+			if(e.getCause() == DamageCause.VOID || (e.getCause() == DamageCause.SUFFOCATION && TimerManager.isFinished("deathmatch"))) {
 				e.setCancelled(true);
 				b.kill();
 			}

@@ -84,6 +84,11 @@ public class ProtectionEvents implements Listener {
 				if(g.getBlocks().containsKey(e.getBlock().getLocation())) {
 					g.getBlocks().remove(e.getBlock().getLocation());
 				}
+				e.setCancelled(true);
+				e.getBlock().setType(Material.AIR);
+				return;
+			}else {
+				e.setCancelled(true);
 			}
 		}
 	}

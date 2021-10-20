@@ -18,18 +18,21 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
 
 public class DragonTimer extends Timer{
 
-	public DragonTimer() {
+	private int time;
+	
+	public DragonTimer(int time) {
 		super("dragon", false);
+		this.time = time;
 	}
 
 	@Override
 	public int getTime() {
-		return 1050;
+		return time;
 	}
 
 	@Override
 	public void run() {
-		Bukkit.broadcastMessage("§c§lCraftok §8» §cLes démons veulent votre mort ! Faîtes attention !");
+		Bukkit.broadcastMessage("§c§lCRAFTOK §8» §cLes démons veulent votre mort ! Faîtes attention !");
 		Map m = BlockSumo.getInstance().getGameManager().getPlayedMap();
 		Bukkit.getWorld(m.getWorld()).spawnEntity(m.getBonus().add(0, 3, 0), EntityType.ENDER_DRAGON);
 		Bukkit.getWorld(m.getWorld()).strikeLightningEffect(m.getBonus());

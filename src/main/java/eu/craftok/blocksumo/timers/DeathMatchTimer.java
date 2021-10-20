@@ -11,13 +11,16 @@ import eu.craftok.utils.PlayerUtils;
 
 public class DeathMatchTimer extends Timer{
 
-	public DeathMatchTimer() {
+	private int time;
+	
+	public DeathMatchTimer(int time) {
 		super("deathmatch", false);
+		this.time = time;
 	}
 
 	@Override
 	public int getTime() {
-		return 750;
+		return time;
 	}
 
 	@Override
@@ -33,7 +36,7 @@ public class DeathMatchTimer extends Timer{
 		wb.setDamageAmount(5);
 		wb.setDamageBuffer(0);
 		wb.setSize(10,60);
-		Bukkit.broadcastMessage("§c§lCraftok §8» §cLe §c§lDEATCHMATCH §ccommence !");
+		Bukkit.broadcastMessage("§c§lCRAFTOK §8» §cLe §c§lDEATCHMATCH §ccommence !");
 	}
 
 }

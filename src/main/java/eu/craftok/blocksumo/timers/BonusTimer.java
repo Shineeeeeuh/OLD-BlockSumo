@@ -28,7 +28,7 @@ public class BonusTimer extends Timer{
 		Map m = BlockSumo.getInstance().getGameManager().getPlayedMap();
 		Location l = m.getBonus();
 		l.getWorld().dropItem(l, BonusManager.getNormalRandomItem());
-		ParticleUtils.drawParticleLine(l.add(0,5,0), l.subtract(0, 3, 0), Particles.FLAME, 10, Color.ORANGE);
+		ParticleUtils.drawParticleLine(l.add(0,5,0), l.subtract(0, 3, 0), Particles.VILLAGER_HAPPY, 20, Color.ORANGE);
 		Bukkit.broadcastMessage("§c§lCRAFTOK §8» §7Un bonus vient d'apparaître au millieu de la map !");
 	}
 

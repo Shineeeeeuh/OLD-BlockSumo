@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -57,13 +58,18 @@ public class GameManager {
 	
 	private Map pickrandomMap() {
 		int randomindex = new Random().nextInt(instance.getMapManager().getMaps().size());
-		InGameEvents.y = (int) (instance.getMapManager().getMaps().get(randomindex).getBonus().getY()+15);
+		InGameEvents.y = (int) (instance.getMapManager().getMaps().get(randomindex).getBonus().getY()+10);
 		return instance.getMapManager().getMaps().get(randomindex);
 	}
 	
 	public void startGame() {
 		state = STATE.WAITING;
 		ArrayList<Location> locs = Lists.newArrayList(playedmap.getSpawns());
+		WorldBorder worldborder = Bukkit.getWorld(playedmap.getWorld()).getWorldBorder();
+		worldborder.setCenter(0, 0);
+		worldborder.setSize(60);
+		worldborder.setDamageBuffer(0);
+		worldborder.setWarningDistance(0);
 		BSPlayerManager.getAlivePlayers().forEach(bp -> {
 			Player p = bp.getPlayer();
 			int r = new Random().nextInt(locs.size());
@@ -95,6 +101,7 @@ public class GameManager {
 	}
 	
 	public void checkWin() {
+		if(state == STATE.FINISH) return;
 		if(BSPlayerManager.getAlivePlayers().size() == 1) {
 			state = STATE.FINISH;
 			Bukkit.getScheduler().cancelAllTasks();
