@@ -23,7 +23,7 @@ public class MegaBonusTimer extends Timer{
 
 	@Override
 	public void run() {
-		Bukkit.broadcastMessage("§c§lCraftok §8» §cLe §c§lMEGABONUS §cest apparu au millieu !");
+		Bukkit.broadcastMessage("Â§cÂ§lCraftok Â§8Â» Â§cLe Â§cÂ§lMEGABONUS Â§cest apparu au millieu !");
 		new MegaBonusTask().runTaskTimer(BlockSumo.getInstance(), 4, 4);
 		Bukkit.getOnlinePlayers().forEach(p -> new PlayerUtils(p).sendSound(Sound.ENDERDRAGON_WINGS, 1F));
 		

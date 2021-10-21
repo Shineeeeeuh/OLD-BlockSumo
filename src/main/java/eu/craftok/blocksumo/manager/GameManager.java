@@ -81,7 +81,7 @@ public class GameManager {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 99999, 250));
 			p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 99999, 250));
 			p.setFlySpeed(0.0F);
-			new PlayerUtils(p).sendTitle(10, 20, 10, "§6Préparation", "§e(Patientez...)");
+			new PlayerUtils(p).sendTitle(10,50, 10, "Â§6PrÃ©paration !", "Â§e(Patientez...)");
 		});
 		BSPlayerManager.updateSB();
 		Bukkit.getScheduler().runTaskLater(instance, () -> {
@@ -92,7 +92,7 @@ public class GameManager {
 				p.getActivePotionEffects().forEach(po -> p.removePotionEffect(po.getType()));
 				p.setFlySpeed(0.2F);
 				PlayerUtils u = new PlayerUtils(p);
-				u.sendTitle(10, 20, 10, "§eBonne chance !", null);
+				u.sendTitle(10, 20, 10, "Â§eBonne chance !", null);
 				u.sendSound(Sound.ENDERDRAGON_GROWL, 1F);
 			});
 			new GameTask().runTaskTimer(instance, 0, 20L);
@@ -107,7 +107,7 @@ public class GameManager {
 			Bukkit.getScheduler().cancelAllTasks();
 			Player p = BSPlayerManager.getAlivePlayers().get(0).getPlayer();
 			p.setGameMode(GameMode.SPECTATOR);
-			new PlayerUtils(p).sendTitle(10, 20, 10, "§6Tu as gagné !", "§eBien jouer !");
+			new PlayerUtils(p).sendTitle(10, 20, 10, "Â§6Tu as gagnÃ© !", "Â§eBien jouer !");
 			new PlayerUtils(p).sendSound(Sound.LEVEL_UP, 1F);
 			FireworkBuilder.summonInstantFirework(FireworkUtils.getRandomFireworkEffect(), playedmap.getBonus());
 			FireworkBuilder.summonInstantFirework(FireworkUtils.getRandomFireworkEffect(), playedmap.getBonus().add(1, 0, 0));
@@ -116,8 +116,8 @@ public class GameManager {
 			FireworkBuilder.summonInstantFirework(FireworkUtils.getRandomFireworkEffect(), playedmap.getBonus().add(0, 0, 1));
 			FireworkBuilder.summonInstantFirework(FireworkUtils.getRandomFireworkEffect(), playedmap.getBonus().add(0, 0, -1));
 			CoreCommon.getCommon().getUserManager().getUserByName(p.getName()).addCoins(5);
-			p.sendMessage("§c§lCRAFTOK §8» §7Vous avez gagné §c5 coins §7!");
-			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c"+p.getName()+" §7a gagné !");
+			p.sendMessage("Â§cÂ§lCRAFTOK Â§Â§8Â» Â§7Vous avez gagnÃ© Â§c5 coins Â§7!");
+			Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§c"+p.getName()+" Â§7a gagnÃ© !");
 			new EndTask().runTaskLater(instance, 160);
 		}
 	}

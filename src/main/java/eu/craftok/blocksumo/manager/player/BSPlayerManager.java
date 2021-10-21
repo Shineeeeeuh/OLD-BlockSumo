@@ -52,29 +52,29 @@ public class BSPlayerManager {
 		GameManager g = BlockSumo.getInstance().getGameManager();
 		List<String> lines = new ArrayList<>();
 		lines.add(" ");
-		lines.add("§c§lPARTIE");
+		lines.add("Â§cÂ§lPARTIE");
 		if (g.getState() == GameManager.STATE.LOBBY) {
-			lines.add(" §fJoueurs §3» §b" + BSPlayerManager.getPlayersNB() + "/8");
-		    lines.add(" §fStatus §3» §bAttente");
+			lines.add(" Â§fJoueurs Â§3Â» Â§b" + BSPlayerManager.getPlayersNB() + "/8");
+		    lines.add(" Â§fStatus Â§3Â» Â§bAttente");
 		}
 		else {
-			lines.add(" §fJoueurs §3» §b" + BSPlayerManager.getAlivePlayers().size() + "/8");
-		    lines.add(" §fStatus §3» §bEn jeu");
+			lines.add(" Â§fJoueurs Â§3Â» Â§b" + BSPlayerManager.getAlivePlayers().size() + "/8");
+		    lines.add(" Â§fStatus Â§3Â» Â§bEn jeu");
 		    lines.add(" ");
 		    for (BSPlayer bsp : BSPlayerManager.getAlivePlayers()) {
 		    	if(bsp.getName().length() >= 13) {
-		    		lines.add("§f" + bsp.getName().substring(0, 13) + " §3» §b§l" + bsp.getLife() + " §c\u2764");
+		    		lines.add("Â§f" + bsp.getName().substring(0, 13) + " Â§3Â» Â§bÂ§l" + bsp.getLife() + " Â§c\u2764");
 		    	}else {
-		    		lines.add("§f" + bsp.getName() + " §3» §b§l" + bsp.getLife() + " §c\u2764");
+		    		lines.add("Â§f" + bsp.getName() + " Â§3Â» Â§bÂ§l" + bsp.getLife() + " Â§c\u2764");
 		    	}
 		    }
 		}
 		lines.add(" ");
-		lines.add("§c§lJEU");
-		lines.add(" §fMode §3» §bSolo");
-		lines.add(" §fMap §3» §b" + g.getPlayedMap().getName());
+		lines.add("Â§cÂ§lJEU");
+		lines.add(" Â§fMode Â§3Â» Â§bSolo");
+		lines.add(" Â§fMap Â§3Â» Â§b" + g.getPlayedMap().getName());
 		lines.add(" ");
-		lines.add("§b[§fcraftok.fr§c]");
+		lines.add("Â§b[Â§fcraftok.frÂ§c]");
 		players.values().forEach(b -> b.updateLines(lines));
 	}
 	

@@ -25,7 +25,7 @@ public class DeathMatchTimer extends Timer{
 		BSPlayerManager.getAlivePlayers().forEach(b -> {
 			b.setLife(1);
 			PlayerUtils utils = new PlayerUtils(b.getPlayer());
-			utils.sendTitle(5, 20, 5, "§f< §c§lDEATHMATCH §f>", "§c§lQue le meilleur gagne !");
+			utils.sendTitle(5, 20, 5, "Â§f< Â§cÂ§lDEATHMATCH Â§f>", "Â§cÂ§lQue le meilleur gagne !");
 			utils.sendSound(Sound.GHAST_SCREAM, 1F);
 		});
 		BSPlayerManager.updateSB();
@@ -33,7 +33,7 @@ public class DeathMatchTimer extends Timer{
 		wb.setDamageAmount(5);
 		wb.setDamageBuffer(0);
 		wb.setSize(10,60);
-		Bukkit.broadcastMessage("§c§lCRAFTOK §8» §cLe §c§lDEATCHMATCH §ccommence !");
+		Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cLe Â§cÂ§lDEATCHMATCH Â§ccommence !");
 	}
 
 }

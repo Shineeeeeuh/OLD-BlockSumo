@@ -26,15 +26,16 @@ public class MegaBonusTask extends BukkitRunnable{
 	@Override
 	public void run() {
 		if((eventtime+1)/5 == 15) {
-			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §cLe §c§lMEGABONUS §ca disparu !");
+			Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cLe Â§cÂ§lMEGABONUS Â§ca disparu !");
 			cancel();
 		}
+		eventtime++;
 		Map m = BlockSumo.getInstance().getGameManager().getPlayedMap();
 		ParticleUtils.playCircle(Particles.FLAME, m.getBonus().add(0, 1, 0), 1, 1);
 		Collection<Entity> entities = Bukkit.getWorld(m.getWorld()).getNearbyEntities(m.getBonus(), 1, 2, 1);
 		if(entities.size() == 0) {
 			if(lastplayer != null) {
-				Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+lastplayer+" §ca perdu le contrôle du MegaBonus !");
+				Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cÂ§l"+lastplayer+" Â§ca perdu le contrÂ§Ã´e du MegaBonus !");
 			}
 			lastplayer = null;
 			time = 0;
@@ -43,7 +44,7 @@ public class MegaBonusTask extends BukkitRunnable{
 			Player p = (Player) entities.stream().filter(e -> e instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR && e.getLocation().subtract(0, 1, 0).getBlock().getType() == Material.GOLD_BLOCK).findFirst().get();
 			if(p == null) {
 				if(lastplayer != null) {
-					Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+lastplayer+" §ca perdu le contrôle du MegaBonus !");
+					Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cÂ§l"+lastplayer+" Â§ca perdu le contrÃ´le du MegaBonus !");
 				}
 				lastplayer = null;
 				time = 0;
@@ -51,7 +52,7 @@ public class MegaBonusTask extends BukkitRunnable{
 			if(lastplayer == p.getName()) {
 				if((time+1)/5 == 5) {
 					p.getInventory().addItem(BonusManager.getMegaRandomItems());
-					Bukkit.broadcastMessage("§c§lCRAFTOK §8» §6§l"+lastplayer+" §ea gagné le §c§lMEGABONUS §e!");
+					Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§6Â§l"+lastplayer+" Â§ea gagnÃ© le Â§cÂ§lMEGABONUS Â§e!");
 					sendProgressTitle(p);
 					new PlayerUtils(p).sendSound(Sound.LEVEL_UP, 1F);
 					cancel();
@@ -62,9 +63,9 @@ public class MegaBonusTask extends BukkitRunnable{
 				}
 			}else {
 				if(lastplayer != null) {
-					Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+lastplayer+" §ca perdu le contrôle du MegaBonus !");
+					Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cÂ§l"+lastplayer+" Â§ca perdu le contrÃ´le du MegaBonus !");
 				}
-				Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+p.getName()+" §ca pris le contrôle du MegaBonus !");
+				Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cÂ§l"+p.getName()+" Â§ca pris le contrÃ´le du MegaBonus !");
 				lastplayer = p.getName();
 				time = 0;
 				sendProgressTitle(p);
@@ -77,14 +78,14 @@ public class MegaBonusTask extends BukkitRunnable{
 		StringBuilder sb = new StringBuilder("");
 		for(int i = 0; i < 10; i++) {
 			if((time/5)*2 >= i) {
-				sb.append("§a\u2588");
+				sb.append("Â§a\u2588");
 				continue;
 			}else {
-				sb.append("§f\u2588");
+				sb.append("Â§f\u2588");
 				continue;
 			}
 		}
-		new PlayerUtils(p).sendTitle(0, 10, 0, "§f["+sb.toString()+"§f]", null);
+		new PlayerUtils(p).sendTitle(0, 6, 0, "Â§f["+sb.toString()+"Â§f]", null);
 	}
 	
 }

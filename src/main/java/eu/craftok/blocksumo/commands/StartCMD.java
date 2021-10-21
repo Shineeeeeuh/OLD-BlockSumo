@@ -14,7 +14,7 @@ public class StartCMD implements CommandExecutor {
 		if(s.hasPermission("adminblocksumo.startgame")) {
 			StartTask.setTimer(5);
 		}else {
-			s.sendMessage("§cVous n'avez pas la permission d'executer cette commande !");
+			s.sendMessage("Â§cVous n'avez pas la permission d'executer cette commande !");
 		}
 		return false;
 	}

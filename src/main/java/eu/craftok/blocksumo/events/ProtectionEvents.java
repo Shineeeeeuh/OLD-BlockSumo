@@ -43,17 +43,17 @@ public class ProtectionEvents implements Listener {
 		GameManager g = BlockSumo.getInstance().getGameManager();
 		Player p = e.getPlayer();
 		if(g.getState() != STATE.INGAME) {
-			e.setFormat(CoreCommon.getCommon().getUserManager().getUserByName(p.getName()).getDisplayName()+" งf: %2$s");
+			e.setFormat(CoreCommon.getCommon().getUserManager().getUserByName(p.getName()).getDisplayName()+" ยงf: %2$s");
 			return;
 		}else {
 			if(BSPlayerManager.getPlayer(p.getName()).isSpectator()) {
 				e.setCancelled(true);
 				BSPlayerManager.getDeadPlayers().forEach(b -> {
-					b.getPlayer().sendMessage("ง7[SPECTATEUR] งf"+p.getName()+" ง7: งf"+e.getMessage());
+					b.getPlayer().sendMessage("ยง7[SPECTATEUR] ยงf"+p.getName()+" ยง7: ยงf"+e.getMessage());
 				});
 				return;
 			}else {
-				e.setFormat(CoreCommon.getCommon().getUserManager().getUserByName(p.getName()).getDisplayName()+" งf: %2$s");
+				e.setFormat(CoreCommon.getCommon().getUserManager().getUserByName(p.getName()).getDisplayName()+" ยงf: %2$s");
 			}
 		}
 	}

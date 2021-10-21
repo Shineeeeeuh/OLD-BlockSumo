@@ -53,7 +53,7 @@ public class LobbyEvents implements Listener {
 			bp.loadWaitingItems();
 			BSPlayerManager.updateSB();
 			int players = BSPlayerManager.getPlayersNB();
-			e.setJoinMessage("§f"+p.getName()+" §7vient de rejoindre la partie §a("+players+"/8)");
+			e.setJoinMessage("ï¿½f"+p.getName()+" Â§7vient de rejoindre la partie Â§a("+players+"/8)");
 			if(timer != 0) {
 				if(players == 8) {
 					if(StartTask.getTimer() > 3) {
@@ -83,7 +83,7 @@ public class LobbyEvents implements Listener {
 		GameManager g = BlockSumo.getInstance().getGameManager();
 		if(g.getState() == STATE.LOBBY) {
 			BSPlayerManager.removePlayer(p.getName());
-			e.setQuitMessage("§f"+p.getName()+" §7vient de quitter la partie §c("+BSPlayerManager.getPlayersNB()+"/8)");
+			e.setQuitMessage("ï¿½f"+p.getName()+" Â§7vient de quitter la partie Â§c("+BSPlayerManager.getPlayersNB()+"/8)");
 			if(BSPlayerManager.getPlayersNB() == 1) {
 				if(ProtectionEvents.closed) {
 					ProtectionEvents.closed = false;
@@ -101,7 +101,7 @@ public class LobbyEvents implements Listener {
 			if(bp.getLastDamager() != null) {
 				if(Bukkit.getPlayer(bp.getLastDamager()) != null) {
 					CoreCommon.getCommon().getUserManager().getUserByName(bp.getLastDamager()).addCoins(2);
-					Bukkit.getPlayer(bp.getLastDamager()).sendMessage("§c§lCRAFTOK §8» §c§l+2 §7coins pour avoir tuer §c"+p.getName());
+					Bukkit.getPlayer(bp.getLastDamager()).sendMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cÂ§l+2 Â§7coins pour avoir tuer Â§c"+p.getName());
 				}
 			}
 			BSPlayerManager.removePlayer(p.getName());
@@ -136,7 +136,7 @@ public class LobbyEvents implements Listener {
 	public void onLogin(PlayerLoginEvent e) {
 		Player p = e.getPlayer();
 		if(BlockSumo.getInstance().getGameManager().getState() != STATE.LOBBY && (!p.hasPermission("craftok.mod") || !p.hasPermission("craftok.admin"))) {
-			e.disallow(Result.KICK_OTHER, "§cDésolé, de vous le dire, mais vous ne pouvez pas spec la partie !");
+			e.disallow(Result.KICK_OTHER, "Â§cDÃ©solÃ©, de vous le dire ! Mais vous ne pouvez pas spec la partie !");
 			e.setResult(Result.KICK_OTHER);
 		}
 	}

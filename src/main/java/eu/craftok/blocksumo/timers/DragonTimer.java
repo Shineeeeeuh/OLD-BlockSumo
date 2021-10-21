@@ -29,7 +29,7 @@ public class DragonTimer extends Timer{
 
 	@Override
 	public void run() {
-		Bukkit.broadcastMessage("§c§lCRAFTOK §8» §cLes démons veulent votre mort ! Faîtes attention !");
+		Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cLes dÃ©mons veulent votre mort ! FaÃ®tes attention !");
 		Map m = BlockSumo.getInstance().getGameManager().getPlayedMap();
 		Bukkit.getWorld(m.getWorld()).spawnEntity(m.getBonus().add(0, 3, 0), EntityType.ENDER_DRAGON);
 		Bukkit.getWorld(m.getWorld()).strikeLightningEffect(m.getBonus());
@@ -39,7 +39,7 @@ public class DragonTimer extends Timer{
 			p.setMaxHealth(2F);
 			p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 255));
 			new PlayerUtils(p).sendSound(Sound.ENDERDRAGON_GROWL, 1F);
-			new PlayerUtils(p).sendTitle(10, 20, 10, "§c§lL'apocalypse commence !", "§c§lFaîtes attention !");
+			new PlayerUtils(p).sendTitle(10, 20, 10, "Â§cÂ§lL'apocalypse commence !", "Â§cÂ§lFaÃ®tes attention !");
 			PacketPlayOutWorldParticles packet = new PacketPlayOutWorldParticles(EnumParticle.MOB_APPEARANCE, false, 0, 0, 0, 0, 0, 0, 0, 1);
 			((CraftPlayer) p).getHandle().playerConnection.sendPacket(packet);
 		});

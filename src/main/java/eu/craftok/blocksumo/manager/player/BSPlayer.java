@@ -73,7 +73,7 @@ public class BSPlayer {
 		inventory.setArmorContents(null);
 		inventory.clear();
 		inventory.setHeldItemSlot(4);
-		inventory.setItem(8, new ItemCreator(Material.BED).setName("§cQuitter").getItemstack());
+		inventory.setItem(8, new ItemCreator(Material.BED).setName("Â§cQuitter").getItemstack());
 		p.updateInventory();
 	}
 	
@@ -82,7 +82,7 @@ public class BSPlayer {
 		PlayerInventory inventory = p.getInventory();
 		inventory.clear();
 		inventory.setArmorContents(null);
-		inventory.setItem(0, new ItemCreator(Material.SHEARS).setUnbreakable(true).setName("§bLa super Cisaille").addEnchantment(Enchantment.DIG_SPEED, 1).getItemstack());
+		inventory.setItem(0, new ItemCreator(Material.SHEARS).setUnbreakable(true).setName("Â§bLa super Cisaille").addEnchantment(Enchantment.DIG_SPEED, 1).getItemstack());
 		inventory.setItem(1, new ItemStack(Material.WOOL, 64, (byte) new Random().nextInt(15)));
 	}
 	
@@ -94,35 +94,35 @@ public class BSPlayer {
 		GameManager g = BlockSumo.getInstance().getGameManager();
 		sb = new ScoreboardBuilder(getPlayer());
 		List<String> lines = new ArrayList<>();
-		sb.updateTitle("§c§lBLOCKSUMO");
+		sb.updateTitle("Â§cÂ§lBLOCKSUMO");
 		lines.add(" ");
-		lines.add("§c§lPARTIE");
-		lines.add(" §fJoueurs §3» §b" + BSPlayerManager.getPlayersNB() + "/8");
+		lines.add("Â§cÂ§lPARTIE");
+		lines.add(" Â§fJoueurs Â§3Â» Â§b" + BSPlayerManager.getPlayersNB() + "/8");
 		if (g.getState() == GameManager.STATE.LOBBY) {
-		    lines.add(" §fStatus §3» §bAttente");
+		    lines.add(" Â§fStatus Â§3Â» Â§bAttente");
 		}
 		else {
-		    lines.add(" §fStatus §3» §bEn jeu");
+		    lines.add(" Â§fStatus Â§3Â» Â§bEn jeu");
 		    lines.add(" ");
 		    for (BSPlayer bsp : BSPlayerManager.getAlivePlayers()) {
 		    	if(bsp.getName().length() >= 13) {
-		    		lines.add("§f" + bsp.getName().substring(0, 13) + " §3» §b§l" + bsp.getLife() + " §c\u2764");
+		    		lines.add("Â§f" + bsp.getName().substring(0, 13) + " Â§3Â» Â§bÂ§l" + bsp.getLife() + " Â§c\u2764");
 		    	}else {
-		    		lines.add("§f" + bsp.getName() + " §3» §b§l" + bsp.getLife() + " §c\u2764");
+		    		lines.add("Â§f" + bsp.getName() + " Â§3Â» Â§bÂ§l" + bsp.getLife() + " Â§c\u2764");
 		    	}
 		    }
 		}
 		lines.add(" ");
-		lines.add("§c§lJEU");
-		lines.add(" §fMode §3» §bSolo");
-		lines.add(" §fMap §3» §b" + g.getPlayedMap().getName());
+		lines.add("Â§cÂ§lJEU");
+		lines.add(" Â§fMode Â§3Â» Â§bSolo");
+		lines.add(" Â§fMap Â§3Â» Â§b" + g.getPlayedMap().getName());
 		lines.add(" ");
-		lines.add("§b[§fcraftok.fr§c]");
+		lines.add("Â§b[Â§fcraftok.frÂ§c]");
 		sb.updateLines(lines);
 	}
 	
 	public void updateLines(List<String> lines) {
-		sb.updateTitle("§c§lBLOCKSUMO");
+		sb.updateTitle("Â§cÂ§lBLOCKSUMO");
 		sb.updateLines(lines);
 	}
 	
@@ -130,13 +130,13 @@ public class BSPlayer {
 		PlayerUtils utils = new PlayerUtils(getPlayer());
 		if(life >= 1) {
 			if(TimerManager.isFinished("deathmatch")) {
-				utils.sendActionBar("§f" + this.life + " §c\u2764 §7restante(s) | §fDeathMatch §3» §b§lActiver");
+				utils.sendActionBar("Â§f" + this.life + " Â§c\u2764 Â§7restante(s) | Â§fDeathMatch Â§3Â» Â§bÂ§lActiver");
 			}else {
-				utils.sendActionBar("§f" + this.life + " §c\u2764 §7restante(s) | §fDeathMatch §3» §b"+TimerManager.getTimeBeforeFinish("deathmatch"));
+				utils.sendActionBar("Â§f" + this.life + " Â§c\u2764 Â§7restante(s) | Â§fDeathMatch Â§3Â» Â§b"+TimerManager.getTimeBeforeFinish("deathmatch"));
 			}
 			return;
 		}else {
-			utils.sendActionBar("§7SPECTATEUR §f| §cVous êtes mort !");
+			utils.sendActionBar("Â§7SPECTATEUR Â§f| Â§cVous Ãªtes mort !");
 		}
 	}
 	
@@ -173,13 +173,13 @@ public class BSPlayer {
 			if(lastdamager != null) {
 				Player damager = Bukkit.getPlayer(lastdamager);
 				if(damager != null) {
-					damager.sendMessage("§c§lCRAFTOK §8» §c§l+2 §7coins pour avoir tuer §c"+name);
+					damager.sendMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cÂ§l+2 Â§7coins pour avoir tuer Â§c"+name);
 					CoreCommon.getCommon().getUserManager().getUserByUniqueId(damager.getUniqueId()).addCoins(2);
 					setLastDamager(null);
 				}
 			}
-			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+name+" §7est éliminé(e) !");
-			new PlayerUtils(p).sendTitle(10, 20, 10, "§c§lVous avez", "§c§lPERDU");
+			Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cÂ§l"+name+" Â§7est Â§liminÂ§(e) !");
+			new PlayerUtils(p).sendTitle(10, 20, 10, "Â§cÂ§lVous avez", "Â§cÂ§lPERDU");
 			BlockSumo.getInstance().getGameManager().checkWin();
 			BSPlayerManager.updateSB();
 			return;
@@ -201,13 +201,13 @@ public class BSPlayer {
 				invincibility = false;
 			}, 60L);
 			if(lastdamager == null) {
-				Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+name+" §7est mort, il lui reste §c§l"+life+" §7vie(s) !");
+				Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cÂ§l"+name+" Â§7est mort, il lui reste Â§cÂ§l"+life+" Â§7vie(s) !");
 			}else {
-				Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+name+" §7a été tuer par §c"+lastdamager+"§7, il lui reste §c§l"+life+" §7vie(s) !");
+				Bukkit.broadcastMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cÂ§l"+name+" Â§7a Ã©tÃ© tuer par Â§c"+lastdamager+"Â§7, il lui reste Â§cÂ§l"+life+" Â§7vie(s) !");
 				
 				Player damager = Bukkit.getPlayer(lastdamager);
 				if(damager != null) {
-					damager.sendMessage("§c§lCRAFTOK §8» §c§l+2 §7coins pour avoir tuer §c"+name);
+					damager.sendMessage("Â§cÂ§lCRAFTOK Â§8Â» Â§cÂ§l+2 Â§7coins pour avoir tuer Â§c"+name);
 					CoreCommon.getCommon().getUserManager().getUserByUniqueId(damager.getUniqueId()).addCoins(2);
 					setLastDamager(null);
 				}
