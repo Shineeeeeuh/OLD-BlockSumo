@@ -2,7 +2,6 @@ package eu.craftok.blocksumo.manager.player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -15,6 +14,7 @@ import org.bukkit.potion.PotionEffect;
 
 import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.manager.GameManager;
+import eu.craftok.blocksumo.manager.block.Blocks;
 import eu.craftok.blocksumo.manager.timers.TimerManager;
 import eu.craftok.blocksumo.scoreboard.ScoreboardBuilder;
 import eu.craftok.core.common.CoreCommon;
@@ -27,6 +27,7 @@ public class BSPlayer {
 	private int life;
 	private String lastdamager;
 	private boolean invincibility, spectator;
+	private Blocks b;
 	
 	public BSPlayer(String name) {
 		this.name = name;
@@ -52,6 +53,10 @@ public class BSPlayer {
 		this.spectator = spectator;
 	}
 	
+	public void setBlock(Blocks b) {
+		this.b = b;
+	}
+	
 	public void initPlayerAbilities() {
 		Player p = getPlayer();
 		p.setHealth(20D);
@@ -74,6 +79,7 @@ public class BSPlayer {
 		inventory.clear();
 		inventory.setHeldItemSlot(4);
 		inventory.setItem(8, new ItemCreator(Material.BED).setName("§cQuitter").getItemstack());
+		inventory.setItem(4, new ItemCreator(Material.PAINTING).setName("§eChoisis ton block §f(§6VIP§f)").getItemstack());
 		p.updateInventory();
 	}
 	
@@ -83,7 +89,7 @@ public class BSPlayer {
 		inventory.clear();
 		inventory.setArmorContents(null);
 		inventory.setItem(0, new ItemCreator(Material.SHEARS).setUnbreakable(true).setName("§bLa super Cisaille").addEnchantment(Enchantment.DIG_SPEED, 1).getItemstack());
-		inventory.setItem(1, new ItemStack(Material.WOOL, 64, (byte) new Random().nextInt(15)));
+		inventory.setItem(1, b.toItem());
 	}
 	
 	public Player getPlayer() {
@@ -124,6 +130,10 @@ public class BSPlayer {
 	public void updateLines(List<String> lines) {
 		sb.updateTitle("§c§lBLOCKSUMO");
 		sb.updateLines(lines);
+	}
+	
+	public boolean ownBlock() {
+		return b != null;
 	}
 	
 	public void updateActionBar() {
@@ -190,6 +200,9 @@ public class BSPlayer {
 				p.removePotionEffect(effect.getType());
 			}
 			invincibility = true;
+			if(p.getItemOnCursor() != null && p.getItemOnCursor().getType() != Material.WOOL && p.getItemOnCursor().getType() != Material.SHEARS) {
+				p.getItemOnCursor().setType(Material.AIR);
+			}
 			for (int i = 0; i < 35; i++){
 				ItemStack item = p.getInventory().getItem(i);
 				if(item == null) continue;

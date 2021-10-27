@@ -113,7 +113,7 @@ public class ProtectionEvents implements Listener {
 	
 	@EventHandler
 	public void onServerListPing(ServerListPingEvent e) {
-		if(closed) {
+		if(closed == true) {
 			e.setMotd("INGAME");
 		}else {
 			e.setMotd("ONLINE");

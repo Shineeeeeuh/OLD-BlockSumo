@@ -1,9 +1,17 @@
 package eu.craftok.blocksumo.events;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,20 +22,29 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import eu.craftok.blocksumo.BlockSumo;
+import eu.craftok.blocksumo.guis.BlockGUI;
 import eu.craftok.blocksumo.manager.GameManager;
 import eu.craftok.blocksumo.manager.GameManager.STATE;
 import eu.craftok.blocksumo.manager.player.BSPlayer;
 import eu.craftok.blocksumo.manager.player.BSPlayerManager;
 import eu.craftok.blocksumo.tasks.StartTask;
 import eu.craftok.core.common.CoreCommon;
+import net.minecraft.server.v1_8_R3.EntityHuman;
+import net.minecraft.server.v1_8_R3.EntityTracker;
+import net.minecraft.server.v1_8_R3.EntityTrackerEntry;
+import net.minecraft.server.v1_8_R3.WorldServer;
 
 public class LobbyEvents implements Listener {
 	
 	private static int timer = 0; 
 	
+	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
+		if(Bukkit.getWorld(BlockSumo.getInstance().getGameManager().getPlayedMap().getWorld()) == null) {
+			BlockSumo.getInstance().createGame();
+		}
 		if(isVanished(p)) {
 			e.setJoinMessage(null);
 			BSPlayer bp = new BSPlayer(p.getName(), true);
@@ -35,7 +52,7 @@ public class LobbyEvents implements Listener {
 			BSPlayerManager.addPlayer(bp);
 			return;
 		}else {
-			if(BlockSumo.getInstance().getGameManager().getState() != STATE.LOBBY && (p.hasPermission("craftok.mod") || p.hasPermission("craftok.admin"))) {
+			if(ProtectionEvents.closed == true && p.hasPermission("craftok.mod")) {
 				e.setJoinMessage(null);
 				BSPlayer bp = new BSPlayer(p.getName(), true);
 				bp.initSB();
@@ -53,12 +70,13 @@ public class LobbyEvents implements Listener {
 			bp.loadWaitingItems();
 			BSPlayerManager.updateSB();
 			int players = BSPlayerManager.getPlayersNB();
-			e.setJoinMessage("�f"+p.getName()+" §7vient de rejoindre la partie §a("+players+"/8)");
+			e.setJoinMessage("§f"+p.getName()+" §7vient de rejoindre la partie §a("+players+"/8)");
 			if(timer != 0) {
 				if(players == 8) {
 					if(StartTask.getTimer() > 3) {
 						StartTask.setTimer(3);
 					}
+					ProtectionEvents.closed = true;
 				}else if(players == 5) {
 					if(StartTask.getTimer() > 30) {
 						StartTask.setTimer(30);
@@ -74,8 +92,44 @@ public class LobbyEvents implements Listener {
 			Location l = BlockSumo.getInstance().getGameManager().getPlayedMap().getLobby();
 			p.teleport(l);
 			p.setGameMode(GameMode.SURVIVAL);
-		}, 1);
+			updateEntities(Bukkit.getOnlinePlayers().stream().filter(pla -> !isVanished(pla)).collect(Collectors.toList()));
+		}, 3);
 	}
+	
+	
+	// FIX D'URGENCE CODE DE : https://gist.github.com/aadnk/3773860
+	
+	public void updateEntities(List<Player> observers) {
+		for (Player player : observers) {
+			updateEntity(player, observers);
+		}
+	}
+	
+	public void updateEntity(Entity entity, List<Player> observers) {
+
+		World world = entity.getWorld();
+		WorldServer worldServer = ((CraftWorld) world).getHandle();
+		EntityTracker tracker = worldServer.tracker;
+		EntityTrackerEntry entry = (EntityTrackerEntry) tracker.trackedEntities
+				.get(entity.getEntityId());
+		List<EntityHuman> nmsPlayers = getNmsPlayers(observers);
+		entry.trackedPlayers.removeAll(nmsPlayers);
+		entry.scanPlayers(nmsPlayers);
+	}
+	
+	private List<EntityHuman> getNmsPlayers(List<Player> players) {
+		List<EntityHuman> nsmPlayers = new ArrayList<EntityHuman>();
+
+		for (Player bukkitPlayer : players) {
+			CraftPlayer craftPlayer = (CraftPlayer) bukkitPlayer;
+			nsmPlayers.add(craftPlayer.getHandle());
+		}
+
+		return nsmPlayers;
+	}
+	
+	// JE VEUX PATCH CA RAPIDEMENT
+	
 	
 	@EventHandler
 	public void onQuit(PlayerQuitEvent e) {
@@ -83,7 +137,7 @@ public class LobbyEvents implements Listener {
 		GameManager g = BlockSumo.getInstance().getGameManager();
 		if(g.getState() == STATE.LOBBY) {
 			BSPlayerManager.removePlayer(p.getName());
-			e.setQuitMessage("�f"+p.getName()+" §7vient de quitter la partie §c("+BSPlayerManager.getPlayersNB()+"/8)");
+			e.setQuitMessage("§f"+p.getName()+" §7vient de quitter la partie §c("+BSPlayerManager.getPlayersNB()+"/8)");
 			if(BSPlayerManager.getPlayersNB() == 1) {
 				if(ProtectionEvents.closed) {
 					ProtectionEvents.closed = false;
@@ -94,14 +148,19 @@ public class LobbyEvents implements Listener {
 					Bukkit.getOnlinePlayers().forEach(po -> po.setLevel(0));
 				}
 			}
-			return;
+			if(BSPlayerManager.getPlayersNB() == 7) {
+				if(ProtectionEvents.closed == true) {
+					ProtectionEvents.closed = false;
+				}
+				return;
+			}
 		}else {
 			e.setQuitMessage(null);
 			BSPlayer bp = BSPlayerManager.getPlayer(p.getName());
-			if(bp.getLastDamager() != null) {
+			if(bp.getLastDamager() != null && g.getState() != STATE.FINISH) {
 				if(Bukkit.getPlayer(bp.getLastDamager()) != null) {
 					CoreCommon.getCommon().getUserManager().getUserByName(bp.getLastDamager()).addCoins(2);
-					Bukkit.getPlayer(bp.getLastDamager()).sendMessage("§c§lCRAFTOK §8» §c§l+2 §7coins pour avoir tuer §c"+p.getName());
+					Bukkit.getPlayer(bp.getLastDamager()).sendMessage("§c§lCRAFTOK §8» §c§l+2 §7coins pour avoir tué §c"+p.getName());
 				}
 			}
 			BSPlayerManager.removePlayer(p.getName());
@@ -117,6 +176,7 @@ public class LobbyEvents implements Listener {
 			return false;
 		}
 	}
+
 	
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
@@ -129,15 +189,25 @@ public class LobbyEvents implements Listener {
 			e.getPlayer().kickPlayer(" ");
 			return;
 		}
+		if(e.getItem().getType() == Material.PAINTING) {
+			e.setCancelled(true);
+			if(e.getPlayer().hasPermission("vip.craftok")) {
+				new BlockGUI(e.getPlayer()).openMenu();
+				return;
+			}else {
+				return;
+			}
+		}
 		return;
 	}
 	
 	@EventHandler
 	public void onLogin(PlayerLoginEvent e) {
 		Player p = e.getPlayer();
-		if(BlockSumo.getInstance().getGameManager().getState() != STATE.LOBBY && (!p.hasPermission("craftok.mod") || !p.hasPermission("craftok.admin"))) {
+		if(ProtectionEvents.closed == true && !p.hasPermission("craftok.mod")) {
 			e.disallow(Result.KICK_OTHER, "§cDésolé, de vous le dire ! Mais vous ne pouvez pas spec la partie !");
 			e.setResult(Result.KICK_OTHER);
 		}
 	}
+
 }

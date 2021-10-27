@@ -1,6 +1,7 @@
 package eu.craftok.blocksumo.events;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -39,6 +41,7 @@ import eu.craftok.utils.particles.Particles;
 public class InGameEvents implements Listener {
 	
 	public static int y = 0;
+	private HashMap<String, String> playerentity = new HashMap<>();
 	
 	@EventHandler
 	public void onDamage(EntityDamageEvent e) {
@@ -47,6 +50,12 @@ public class InGameEvents implements Listener {
 			
 			Player p = (Player) e.getEntity();
 			BSPlayer b = BSPlayerManager.getPlayer(p.getName());
+			
+			if(b.isSpectator()) {
+				p.teleport(BlockSumo.getInstance().getGameManager().getPlayedMap().getBonus().add(0,5,0));
+				e.setCancelled(true);
+				return;
+			}
 			
 			//TODO : KILL DETECT
 			
@@ -81,6 +90,11 @@ public class InGameEvents implements Listener {
 			}
 			if(e.getDamager() instanceof Player) {
 				Player d = (Player) e.getDamager();
+				BSPlayer b2 = BSPlayerManager.getPlayer(d.getName());
+				if(b2.isInvincibility()) {
+					e.setCancelled(true);
+					return;
+				}
 				p.setVelocity(d.getLocation().getDirection().setY(0).normalize().multiply(0.12));
 				b.setLastDamager(d.getName());
 			}
@@ -120,23 +134,6 @@ public class InGameEvents implements Listener {
 	}
 	
 	@EventHandler
-    public void onDamageByOtherEntity(EntityDamageByEntityEvent e) {
-		if (e.getDamager() instanceof TNTPrimed && e.getEntity() instanceof Player) {
-			TNTPrimed tnt = (TNTPrimed) e.getDamager();
-			Player player = (Player) e.getEntity();
-			 for (Entity entity : tnt.getNearbyEntities(1.5, 1.5, 1.5)) {
-				 if(entity instanceof Player) {
-					 Player p = (Player) entity;
-					 if(!p.equals(player)) {
-						 continue;
-					 }
-					 player.setVelocity(player.getLocation().getDirection().multiply(0.7).setY(0.7));
-				 }
-			 }
-		}
-	}
-	
-	@EventHandler
     public void onConsume(PlayerItemConsumeEvent e) {
         if (e.getItem().getType().equals(Material.POTION)) {
         	Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(BlockSumo.getInstance(), new Runnable() {
@@ -168,7 +165,8 @@ public class InGameEvents implements Listener {
 	public void onPlace(BlockPlaceEvent e) {
 		if(e.getBlock().getType() == Material.TNT) {
 			e.getBlock().setType(Material.AIR);
-			e.getBlock().getLocation().getWorld().spawnEntity(e.getBlock().getLocation().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
+			TNTPrimed tnt = (TNTPrimed) e.getBlock().getLocation().getWorld().spawnEntity(e.getBlock().getLocation().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
+			playerentity.put(tnt.getUniqueId().toString(), e.getPlayer().getName());
 			if(e.getPlayer().getItemInHand().getAmount()-1 == 0) {
 				e.getPlayer().setItemInHand(null);
 			}else {
@@ -178,7 +176,7 @@ public class InGameEvents implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
 	public void onExplode(EntityExplodeEvent e) {
 		if(e.getEntityType() == EntityType.ENDER_DRAGON) {
 			e.blockList().clear();
@@ -204,5 +202,36 @@ public class InGameEvents implements Listener {
 		}
 	}
 	
-	
+	@EventHandler
+    public void onDamageByOtherEntity(EntityDamageByEntityEvent e) {
+		if(e.getDamager() instanceof Fireball && e.getEntity() instanceof Player) {
+			Player player = (Player) e.getEntity();
+			Fireball ball = (Fireball) e.getDamager();
+			if(ball.getShooter() instanceof Player) {
+				Player p = (Player) ball.getShooter();
+				if(p.getName() != player.getName()) {
+					BSPlayerManager.getPlayer(player.getName()).setLastDamager(p.getName());
+				}
+			}
+			return;
+		}
+		if (e.getDamager() instanceof TNTPrimed && e.getEntity() instanceof Player) {
+			TNTPrimed tnt = (TNTPrimed) e.getDamager();
+			Player player = (Player) e.getEntity();
+			 for (Entity entity : tnt.getNearbyEntities(1.5, 1.5, 1.5)) {
+				 if(entity instanceof Player) {
+					 Player p = (Player) entity;
+					 if(!p.equals(player)) {
+						 continue;
+					 }
+					 player.setVelocity(player.getLocation().getDirection().multiply(0.7).setY(0.7));
+					 if(playerentity.get(tnt.getUniqueId().toString()) != player.getName()) {
+						 BSPlayerManager.getPlayer(player.getName()).setLastDamager(playerentity.get(tnt.getUniqueId().toString()));
+					 }
+				 }
+			 }
+			 return;
+		}
+	}
+
 }

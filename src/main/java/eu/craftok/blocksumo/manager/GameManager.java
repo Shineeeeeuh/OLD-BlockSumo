@@ -3,6 +3,7 @@ package eu.craftok.blocksumo.manager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -17,6 +18,7 @@ import com.google.common.collect.Lists;
 
 import eu.craftok.blocksumo.BlockSumo;
 import eu.craftok.blocksumo.events.InGameEvents;
+import eu.craftok.blocksumo.manager.block.BlockManager;
 import eu.craftok.blocksumo.manager.map.Map;
 import eu.craftok.blocksumo.manager.player.BSPlayerManager;
 import eu.craftok.blocksumo.tasks.EndTask;
@@ -83,6 +85,7 @@ public class GameManager {
 			p.setFlySpeed(0.0F);
 			new PlayerUtils(p).sendTitle(10,50, 10, "§6Préparation !", "§e(Patientez...)");
 		});
+		BlockManager.assignRandomBlock(BSPlayerManager.getAlivePlayers().stream().filter(b -> !b.ownBlock()).collect(Collectors.toList()));
 		BSPlayerManager.updateSB();
 		Bukkit.getScheduler().runTaskLater(instance, () -> {
 			state = STATE.INGAME;

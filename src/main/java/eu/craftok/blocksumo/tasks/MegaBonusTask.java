@@ -1,6 +1,7 @@
 package eu.craftok.blocksumo.tasks;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -25,7 +26,7 @@ public class MegaBonusTask extends BukkitRunnable{
 
 	@Override
 	public void run() {
-		if((eventtime+1)/5 == 15) {
+		if((eventtime+1)/5 == 30) {
 			Bukkit.broadcastMessage("§c§lCRAFTOK §8» §cLe §c§lMEGABONUS §ca disparu !");
 			cancel();
 		}
@@ -35,13 +36,21 @@ public class MegaBonusTask extends BukkitRunnable{
 		Collection<Entity> entities = Bukkit.getWorld(m.getWorld()).getNearbyEntities(m.getBonus(), 1, 2, 1);
 		if(entities.size() == 0) {
 			if(lastplayer != null) {
-				Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+lastplayer+" §ca perdu le contr§ôe du MegaBonus !");
+				Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+lastplayer+" §ca perdu le contrôle du MegaBonus !");
 			}
 			lastplayer = null;
 			time = 0;
 			return;
 		}else {
-			Player p = (Player) entities.stream().filter(e -> e instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR && e.getLocation().subtract(0, 1, 0).getBlock().getType() == Material.GOLD_BLOCK).findFirst().get();
+			if(entities.stream().filter(e -> e instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR && !isVanished((Player) e) && e.getLocation().subtract(0, 1, 0).getBlock().getType() == Material.GOLD_BLOCK).collect(Collectors.toList()).isEmpty()) {
+				if(lastplayer != null) {
+					Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+lastplayer+" §ca perdu le contrôle du MegaBonus !");
+					lastplayer = null;
+					time = 0;
+				}
+				return;
+			}
+			Player p = (Player) entities.stream().filter(e -> e instanceof Player && ((Player) e).getGameMode() != GameMode.SPECTATOR && !isVanished((Player) e) && e.getLocation().subtract(0, 1, 0).getBlock().getType() == Material.GOLD_BLOCK).findFirst().get();
 			if(p == null) {
 				if(lastplayer != null) {
 					Bukkit.broadcastMessage("§c§lCRAFTOK §8» §c§l"+lastplayer+" §ca perdu le contrôle du MegaBonus !");
@@ -85,7 +94,15 @@ public class MegaBonusTask extends BukkitRunnable{
 				continue;
 			}
 		}
-		new PlayerUtils(p).sendTitle(0, 6, 0, "§f["+sb.toString()+"§f]", null);
+		new PlayerUtils(p).sendTitle(0, 6, 0, " ", "§f["+sb.toString()+"§f]");
+	}
+	
+	public boolean isVanished(Player p) {
+		if(p != null && p.hasMetadata("vanished") && !p.getMetadata("vanished").isEmpty()) {
+			return p.getMetadata("vanished").get(0).asBoolean();
+		}else {
+			return false;
+		}
 	}
 	
 }

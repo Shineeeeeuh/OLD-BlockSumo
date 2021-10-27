@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class Map {
@@ -59,9 +60,20 @@ public class Map {
 		return world;
 	}
 	
+	public void setWorld(String world) {
+		this.world = world;
+	}
+	
 	public void teleport(Player p) {
 		int randomIndex = new Random().nextInt(spawns.size());
-		p.teleport(doubleToLocation(spawns.get(randomIndex)));
+		Location l = doubleToLocation(spawns.get(randomIndex));
+		if(l.add(0, 1, 0).getBlock().getType() != Material.AIR || l.getBlock().getType() != Material.AIR) {
+			p.teleport(p.getWorld().getHighestBlockAt(l).getLocation());
+			return;
+		}else {
+			p.teleport(l);
+		}
 	}
 	
 }
+

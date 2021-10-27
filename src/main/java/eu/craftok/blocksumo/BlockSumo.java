@@ -1,5 +1,6 @@
 package eu.craftok.blocksumo;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import eu.craftok.blocksumo.commands.StartCMD;
@@ -37,6 +38,16 @@ public class BlockSumo extends JavaPlugin{
 		TimerManager.registerTimer(new BonusTimer());
 		TimerManager.registerTimer(new DragonTimer());
 	}
+	
+	public void createGame() {
+		if(gamemanager.getPlayedMap().getWorld().equalsIgnoreCase("Quartz")) {
+			Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "swm load-template Quartz Quartz-1");
+			gamemanager.getPlayedMap().setWorld("Quartz-1");
+		}else{
+			Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "swm load "+gamemanager.getPlayedMap().getWorld());
+		}
+	}
+
 	
 	public static BlockSumo getInstance() {
 		return instance;
